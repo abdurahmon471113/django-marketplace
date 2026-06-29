@@ -1,15 +1,17 @@
-from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.shortcuts import redirect, render
+
 # render → показывает HTML страницу пользователю
 # redirect → отправляет пользователя на другой URL
 
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
 # UserCreationForm → готовая форма регистрации (username, password1, password2)
 # AuthenticationForm → готовая форма логина (проверка username + password)
 
-from django.contrib.auth import login, logout
+
 # login → "включает" пользователя в систему (создаёт сессию)
 # logout → "выключает" пользователя (удаляет сессию)
-
 
 
 # =========================
@@ -18,7 +20,7 @@ from django.contrib.auth import login, logout
 def register_view(request):
     # request → это всё, что пришло от браузера (GET или POST + данные)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         # POST = пользователь отправил форму (нажал кнопку "зарегистрироваться")
 
         form = UserCreationForm(request.POST)
@@ -36,7 +38,7 @@ def register_view(request):
             login(request, user)
             # автоматически "входим" этого пользователя (создаётся session)
 
-            return redirect('home')
+            return redirect("home")
             # после регистрации отправляем пользователя на главную страницу
 
     else:
@@ -45,7 +47,7 @@ def register_view(request):
         form = UserCreationForm()
         # пустая форма (чтобы показать поля)
 
-    return render(request, 'user_app/register.html', {'form': form})
+    return render(request, "user_app/register.html", {"form": form})
     # render:
     # берёт HTML файл
     # вставляет туда форму
@@ -62,7 +64,7 @@ def login_view(request):
     # если POST → берём данные
     # если GET → форма пустая
 
-    if request.method == 'POST' and form.is_valid():
+    if request.method == "POST" and form.is_valid():
         # если пользователь отправил форму И данные правильные
 
         user = form.get_user()
@@ -71,10 +73,10 @@ def login_view(request):
         login(request, user)
         # создаём сессию → пользователь становится "вошедшим"
 
-        return redirect('home')
+        return redirect("home")
         # отправляем на главную страницу
 
-    return render(request, 'user_app/login.html', {'form': form})
+    return render(request, "user_app/login.html", {"form": form})
     # показываем страницу логина (даже если есть ошибки)
 
 
@@ -86,7 +88,7 @@ def logout_view(request):
     logout(request)
     # удаляем session → пользователь выходит из системы
 
-    return redirect('home')
+    return redirect("home")
     # отправляем на главную страницу
 
 
@@ -95,12 +97,13 @@ def logout_view(request):
 # =========================
 def home_view(request):
 
-    return render(request, 'user_app/home.html')
+    return render(request, "user_app/home.html")
     # просто показываем HTML страницу
     # без логики, без проверки, просто отображение
 
-def about_view(request):
-    if request.method == 'POST':
-        return redirect('home')
 
-    return render(request, 'user_app/about.html')
+def about_view(request):
+    if request.method == "POST":
+        return redirect("home")
+
+    return render(request, "user_app/about.html")

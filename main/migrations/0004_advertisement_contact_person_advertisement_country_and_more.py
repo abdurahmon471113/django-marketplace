@@ -8,28 +8,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('main', '0003_category_created_at_category_updated_at_and_more'),
+        ("main", "0003_category_created_at_category_updated_at_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='advertisement',
-            name='contact_person',
+            model_name="advertisement",
+            name="contact_person",
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='advertisement',
-            name='country',
-            field=django_countries.fields.CountryField(blank=True, max_length=2, null=True),
+            model_name="advertisement",
+            name="country",
+            field=django_countries.fields.CountryField(
+                blank=True, max_length=2, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='advertisement',
-            name='email',
+            model_name="advertisement",
+            name="email",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
         migrations.AddField(
-            model_name='advertisement',
-            name='phone',
-            field=phonenumber_field.modelfields.PhoneNumberField(blank=True, max_length=128, null=True, region=None),
+            model_name="advertisement",
+            name="phone",
+            field=phonenumber_field.modelfields.PhoneNumberField(
+                blank=True, max_length=128, null=True, region=None
+            ),
         ),
     ]
