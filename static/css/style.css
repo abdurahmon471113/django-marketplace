@@ -1,0 +1,59 @@
+body {
+    background-color: white !important;
+}
+
+
+
+.widget_category {
+     background-color: #f1f3f5 !important;
+}
+
+.widget_category:hover {
+     background-color: #A6A6A6 !important;
+}
+
+
+
+
+
+.widget_title {
+     width: 698px !important;
+     height: 44px !important;
+}
+
+
+
+
+
+.widget_price {
+     background-color: #f1f3f5 !important;
+}
+
+.widget_price:hover {
+     background-color: #A6A6A6 !important;
+}
+
+
+
+
+.widget_description {
+      width: 698px !important;
+      height: 287px !important;
+}
+
+
+
+.widget-base-dimension {
+     width: 360px !important;
+     height: 49px !important;
+}
+
+
+
+.error {
+     color: #dc3545;
+}
+
+
+
+

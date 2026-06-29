@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1 class="fw-bold ms-3">Создать объявление</h1>
+   <div class="container mt-4">
+    
+    
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            <strong>Non-field error:</strong> {{ form.non_field_errors }}
+          </div>
+        {% endif %}
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+            <h5 class="fw-bold mb-3">Опишите в подробностях</h5>
+        <div class="form-group">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {% for error in form.title.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+        <div class="form-group">
+            <label for="category" class="form-label">{{ form.category.label_tag }}</label>
+            <p>{{ form.category }}</p>
+            {% for error in form.category.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+          </div>
+        </div>
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+        <div class="form-group">
+            {{ form.price.label_tag }}
+
+            <div class="ad-form-width">
+                <p>{{ form.price }}</p>
+            </div>
+            {% for error in form.price.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+          </div>
+    </div>
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+        <div class="form-group">
+            {{ form.description.label_tag }}
+                {{ form.description }}
+            {% for error in form.description.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+        <h5 class="fw-bold mb-3">Контактная информация</h5>
+        <div class="form-group">
+            {{ form.contact_person.label_tag }}
+            <p>{{ form.contact_person }}</p>
+            {% for error in form.contact_person.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+
+
+
+        <div class="form-group">
+            {{ form.email.label_tag }}
+            <p>{{ form.email }}</p>
+            {% for error in form.email.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+          </div>
+
+
+
+
+        <div class="form-group">
+            {{ form.phone.label_tag }}
+            <p>{{ form.phone }}</p>
+            {% for error in form.phone.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+          </div>
+    </div>
+
+        
+    <div class="p-4 mb-3 card shadow border-0">
+        <div class="ms-auto">
+        <button type="submit" class="btn btn-dark btn-lg bg-dark mb-1 rounded-1">
+            Опубликовать
+        </button>
+        </div>
+    </div>
+
+    </form>
+
+</div>
+{% endblock %}
