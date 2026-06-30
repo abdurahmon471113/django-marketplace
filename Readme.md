@@ -8,10 +8,14 @@ The application features robust user authentication, dynamic product filtering, 
 
 
 ## 🛠️ Tech Stack
-Framework: Django(Python)
+Framework: Django(Python) 
+-
 Database: PostgreSQL
+-
 Frontend: Django Templates (HTML5, CSS3, Bootstrap5.3)
-Configuration: Python-dotenv (.env)
+-
+Configuration: django-environ  (.env)
+-
 
 
 ---
