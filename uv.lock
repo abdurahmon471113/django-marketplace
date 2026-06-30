@@ -87,6 +87,15 @@ wheels = [
 ]
 
 [[package]]
+name = "django-environ"
+version = "0.14.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/57/e1/4c4ddcf6e90f023e89edb1d92f9a7fffce61ad4b691df497f2f5c0be6e26/django_environ-0.14.0.tar.gz", hash = "sha256:b6c48d93b9d2ff8a3ea14099e90c35aa4f101c1b4d5f262dfee0d27b06742ed7", size = 60417, upload-time = "2026-06-18T22:49:55.847Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1a/fe/67b423fc30f16d10259e901320fbc121746bf168aaaad9043e6ebb0110c1/django_environ-0.14.0-py3-none-any.whl", hash = "sha256:8dbe8a57f0a540ab8abd6f54f230de5e99e3a2c9d797cb9caecb037bca3d47d8", size = 20934, upload-time = "2026-06-18T22:49:54.355Z" },
+]
+
+[[package]]
 name = "django-phonenumber-field"
 version = "8.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -224,6 +233,15 @@ wheels = [
 ]
 
 [[package]]
+name = "python-dotenv"
+version = "1.2.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/ed/0301aeeac3e5353ef3d94b6ec08bbcabd04a72018415dcb29e588514bba8/python_dotenv-1.2.2.tar.gz", hash = "sha256:2c371a91fbd7ba082c2c1dc1f8bf89ca22564a087c2c287cd9b662adde799cf3", size = 50135, upload-time = "2026-03-01T16:00:26.196Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0b/d7/1959b9648791274998a9c3526f6d0ec8fd2233e4d4acce81bbae76b44b2a/python_dotenv-1.2.2-py3-none-any.whl", hash = "sha256:1d8214789a24de455a8b8bd8ae6fe3c6b69a5e3d64aa8a8e5d68e694bbcb285a", size = 22101, upload-time = "2026-03-01T16:00:25.09Z" },
+]
+
+[[package]]
 name = "pythonproject"
 version = "0.1.0"
 source = { virtual = "." }
@@ -231,9 +249,11 @@ dependencies = [
     { name = "asgiref" },
     { name = "django" },
     { name = "django-countries" },
+    { name = "django-environ" },
     { name = "django-phonenumber-field" },
     { name = "phonenumbers" },
     { name = "psycopg2-binary" },
+    { name = "python-dotenv" },
     { name = "sqlparse" },
     { name = "typing-extensions" },
     { name = "tzdata" },
@@ -251,9 +271,11 @@ requires-dist = [
     { name = "asgiref", specifier = "==3.11.1" },
     { name = "django", specifier = "==6.0.6" },
     { name = "django-countries", specifier = "==9.0.0" },
+    { name = "django-environ", specifier = ">=0.14.0" },
     { name = "django-phonenumber-field", specifier = "==8.4.0" },
     { name = "phonenumbers", specifier = "==9.0.32" },
     { name = "psycopg2-binary", specifier = "==2.9.12" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "sqlparse", specifier = "==0.5.5" },
     { name = "typing-extensions", specifier = "==4.15.0" },
     { name = "tzdata", specifier = "==2026.2" },
