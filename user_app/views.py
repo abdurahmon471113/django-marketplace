@@ -97,6 +97,7 @@ def logout_view(request):
 # =========================
 def home_view(request):
 
+
     return render(request, "user_app/home.html")
     # просто показываем HTML страницу
     # без логики, без проверки, просто отображение
