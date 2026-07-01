@@ -3,11 +3,9 @@
     <a class="navbar-brand" href="{% url 'home' %}">
         BuySell.com
     </a>
-    <a class="navbar-brand" href="{% url 'about' %}">О нас
-    </a>
 
 
-<div class="mx-auto">
+    <div class="mx-auto">
         <a class="btn btn-light text-dark btn-lg fw-bold shadow" href="{% url 'main:my_ads' %}">
             Мои объявления
         </a>
@@ -32,14 +30,14 @@
 
             </span>
 
-            <a href="{% url 'logout' %}"
+            <a href="{% url 'user_app:logout' %}"
                class="btn btn-outline-light btn-sm">
                 Выйти
             </a>
 
         {% else %}
 
-            <a href="{% url 'login' %}"
+            <a href="{% url 'user_app:login' %}"
                class="btn btn-primary">
                 Войти
             </a>

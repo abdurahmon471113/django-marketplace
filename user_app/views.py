@@ -90,21 +90,3 @@ def logout_view(request):
 
     return redirect("home")
     # отправляем на главную страницу
-
-
-# =========================
-# ГЛАВНАЯ СТРАНИЦА
-# =========================
-def home_view(request):
-
-
-    return render(request, "user_app/home.html")
-    # просто показываем HTML страницу
-    # без логики, без проверки, просто отображение
-
-
-def about_view(request):
-    if request.method == "POST":
-        return redirect("home")
-
-    return render(request, "user_app/about.html")

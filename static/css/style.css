@@ -55,5 +55,6 @@ body {
 }
 
 
-
-
+.others-ad-cards {
+      width: 300px !important;
+}

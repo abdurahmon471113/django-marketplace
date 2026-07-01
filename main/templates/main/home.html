@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<!-- Класс container-fluid позволит сетке растянуться шире, как на OLX -->
+<div class="container-fluid px-md-5 mt-5">
+    <h1>Добро пожаловать на сайт</h1>
+    <p>Это главная страница</p>
+
+    <div class="d-flex justify-content-center align-items-center my-5">
+        <h2 class="fw-bold">VIP-объявления</h2>
+    </div>
+
+    <div class="row g-3">
+        {% for ad in others %}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="others-ad-cards shadow border-0 rounded-0 h-100 p-3 d-flex flex-column justify-content-between bg-white">
+
+                    <div class="card-top-content">
+                        <h5 class="fw-semibold fs-6 text-dark mb-3">
+                            {{ ad.title }}
+                        </h5>
+
+                        <hr>
+                        <p class="mb-2 text-muted small"><b>Категория:</b> {{ ad.category }}</p>
+                        <p class="mb-2 text-muted small"><b>Контактное лицо:</b> {{ ad.contact_person }}</p>
+                        <p class="mb-2 text-muted small"><b>Email:</b> {{ ad.email }}</p>
+                        <p class="mb-3 text-muted small"><b>Телефон:</b> {{ ad.phone }}</p>
+                    </div>
+
+                    <div class="card-bottom-content mt-auto">
+                        <b class="text-dark fw-bold fs-6">
+                            {{ ad.price }} сум
+                        </b>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
