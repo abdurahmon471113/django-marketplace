@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Объявления{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h1 class="fw-bold mb-4">
+        Объявления пользователя {{ user.username }}
+    </h1>
+
+     <h3 class="fw-semibold mb-4">
+    У {{ user.username }} {{ ads_count }} объявлений
+    </h3>
+
+    {% for ad in my_ads %}
+
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+
+        <div class="d-flex justify-content-between">
+
+            <div style="max-width:75%;">
+
+                {% if ad.image_1 %}
+                    <img
+                        src="{{ ad.image_1.url }}"
+                        alt="{{ ad.title }}"
+                        class="rounded mb-3"
+                        style="width:260px; height:190px; object-fit:cover;"
+                    >
+                {% endif %}
+
+                <h4 class="fw-bold mb-2">
+                    {{ ad.title }}
+                </h4>
+
+                <h3 class="text-success fw-bold mb-3">
+                    {{ ad.price|intcomma }} сум
+                </h3>
+
+                <p class="text-muted mb-3">
+                    {{ ad.description }}
+                </p>
+
+                <hr>
+
+                <p class="mb-2">
+                    <strong>Категория:</strong> {{ ad.category }}
+                </p>
+
+                <p class="mb-2">
+                    <strong>Контактное лицо:</strong> {{ ad.contact_person }}
+                </p>
+
+                <p class="mb-2">
+                    <strong>Email:</strong> {{ ad.email }}
+                </p>
+
+                <p class="mb-0">
+                    <strong>Телефон:</strong> {{ ad.phone }}
+                </p>
+
+            </div>
+
+            
+            <div class="d-flex flex-column align-items-end">
+
+                <a href="{% url 'main:change_ad' ad.pk %}"
+                   class="btn btn-outline-dark mb-2">
+                    ✏️ Редактировать
+                </a>
+
+                <a href="{% url 'main:delete_ad' ad.pk %}"
+                   class="btn btn-outline-danger">
+                    🗑 Удалить
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% empty %}
+
+        <div class="alert alert-info">
+            У вас пока нет объявлений.
+        </div>
+
+    {% endfor %}
+
+</div>
+{% endblock %}

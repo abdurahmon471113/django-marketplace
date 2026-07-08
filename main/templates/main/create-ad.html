@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="fw-bold ms-3">Создать объявление</h1>
+
+<div class="container mt-4">
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        <strong>Non-field error:</strong> {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="p-4 mb-3 card shadow border-0">
+        <h5 class="fw-bold mb-3">Опишите в подробностях</h5>
+
+        <div class="form-group">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {% for error in form.title.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+        <div class="form-group mt-3">
+            {{ form.category.label_tag }}
+            {{ form.category }}
+            {% for error in form.category.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+
+
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+
+        <h5 class="fw-bold mb-3">Фото</h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <label for="{{ form.image_1.id_for_label }}"
+                       class="image-file d-flex justify-content-center align-items-center fw-bold fs-5"
+                       style="cursor:pointer;background-color:#FFFBEF;min-height:145px;">
+                    Добавить фото
+                </label>
+                 <div style="display:none;">
+                {{ form.image_1 }}
+                </div>
+            </div>
+
+
+            </div>
+    </div>
+
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+        {{ form.price.label_tag }}
+        {{ form.price }}
+        {% for error in form.price.errors %}
+          <p class="error">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+        {{ form.description.label_tag }}
+        {{ form.description }}
+        {% for error in form.description.errors %}
+          <p class="error">{{ error }}</p>
+        {% endfor %}
+    </div>
+
+
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+        <h5 class="fw-bold mb-3">Контактная информация</h5>
+
+        {{ form.contact_person.label_tag }}
+        {{ form.contact_person }}
+
+        {{ form.email.label_tag }}
+        {{ form.email }}
+
+        {{ form.phone.label_tag }}
+        {{ form.phone }}
+    </div>
+
+
+
+
+
+    <div class="p-4 mb-3 card shadow border-0">
+           <div class="ms-auto">
+        <button type="submit"
+                class="btn btn-dark rounded-1 btn-lg">
+            Опубликовать
+        </button>
+    </div>
+    </div>
+
+</form>
+
+</div>
+{% endblock %}

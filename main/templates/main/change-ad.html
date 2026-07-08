@@ -6,7 +6,7 @@
 
 
 
-    <form method="post">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% if form.non_field_errors %}
@@ -33,6 +33,31 @@
             {% endfor %}
           </div>
         </div>
+
+
+
+
+        <div class="p-4 mb-3 card shadow border-0">
+
+        <h5 class="fw-bold mb-3">Фото</h5>
+
+        <div class="row g-3">
+
+            <div class="col-md-3">
+                <label for="{{ form.image_1.id_for_label }}"
+                       class="image-file d-flex justify-content-center align-items-center fw-bold fs-5"
+                       style="cursor:pointer;background-color:#FFFBEF;min-height:145px;">
+                    Сменить фото
+                </label>
+                 <div style="display:none;">
+                {{ form.image_1 }}
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+
 
 
 

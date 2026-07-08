@@ -43,6 +43,7 @@ body {
 
 
 
+
 .widget-base-dimension {
      width: 360px !important;
      height: 49px !important;
@@ -55,6 +56,67 @@ body {
 }
 
 
-.others-ad-cards {
-      width: 300px !important;
+
+
+
+.cursor-link-ad_detail {
+      text-decoration: none !important;
+      cursor: pointer !important;
+      color: inherit !important;
+}
+
+
+
+
+.updated-pick_file-button {
+       display: inline-block;
+    padding: 10px 15px;
+    background: #FFFBEF;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.updated-pick_file-button:hover {
+    background: #fff3d6;
+}
+
+
+
+
+
+
+.image-top-list {
+    padding: 10px;
+}
+
+
+
+.image-style-detail{
+     width: 400px !important;
+     height: 380px !important;
+}
+
+
+
+.navbar-heart-favorites {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    text-decoration: none;
+
+    font-size: 48px;
+    font-weight: bold;
+
+}
+
+.navbar-heart:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
 }

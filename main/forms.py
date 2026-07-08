@@ -1,11 +1,12 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 from .models import Advertisement
 
 
 class AdvertisementForm(forms.ModelForm):
-
     class Meta:
         model = Advertisement
         fields = [
@@ -16,6 +17,7 @@ class AdvertisementForm(forms.ModelForm):
             "contact_person",
             "phone",
             "email",
+            "images",
         ]
 
         labels = {
@@ -26,6 +28,7 @@ class AdvertisementForm(forms.ModelForm):
             "contact_person": "Контактное лицо",
             "email": "Email-адрес",
             "phone": "Номер телефона",
+            "image": "Фото",
         }
 
         widgets = {
@@ -53,7 +56,7 @@ class AdvertisementForm(forms.ModelForm):
                     "class": "widget-base-dimension form-control rounded-1 border-dark",
                 }
             ),
-            "email": forms.TextInput(
+            "email": forms.EmailInput(
                 attrs={
                     "class": "widget-base-dimension form-control rounded-1 border-dark",
                 }
@@ -63,21 +66,21 @@ class AdvertisementForm(forms.ModelForm):
                     "class": "widget-base-dimension form-control rounded-1 border-dark",
                 }
             ),
+            "images": forms.ClearableFileInput(
+                attrs={"class": "widget_image form-control rounded-0 border-1"}
+            ),
         }
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Добавляем валидатор к существующему полю title
-        self.fields["title"].validators.append(self.validate_title)
-        # Добавляем валидатор к существующему полю description
-        self.fields["description"].validators.append(self.validate_description)
-        # Добавляем валидатор к существующему полю price
-        self.fields["price"].validators.append(self.validate_price)
-
         if user:
             self.fields["email"].initial = user.email
             self.fields["email"].disabled = True
+
+        self.fields["title"].validators.append(self.validate_title)
+        self.fields["description"].validators.append(self.validate_description)
+        self.fields["price"].validators.append(self.validate_price)
 
     def validate_title(self, value):
         if len(value) < 12:
@@ -88,5 +91,27 @@ class AdvertisementForm(forms.ModelForm):
             raise ValidationError("Описание должно содержать минимум 40 символов.")
 
     def validate_price(self, value):
-        if (value) <= 0:
+        if value <= 0:
             raise ValidationError("Цена должна быть больше 0.")
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "password1",
+            "password2",
+        ]
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+
+        if commit:
+            user.save()
+
+        return user

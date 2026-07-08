@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 import environ
@@ -60,6 +61,7 @@ INSTALLED_APPS = [
     "main",
     "phonenumber_field",
     "django_countries",
+    "django.contrib.humanize",
 ]
 
 MIDDLEWARE = [
@@ -146,3 +148,7 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 # Это перейти к форме войти если пользователь не залогинелся
 LOGIN_URL = "/user_app/login/"
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Подробнее{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid px-md-3">
+
+    <div class="d-flex justify-content-center">
+        <h2 class="fw-bold mt-5">Подробнее об объявлении</h2>
+    </div>
+
+
+<!--    # 1. Главное фото-->
+    {% if ad.image_1 %}
+    <div class="text-center">
+        <img
+            src="{{ ad.image_1.url }}"
+            alt="{{ ad.title }}"
+            class="mt-5"
+            style="max-height:950px; min-width:670px;">
+    </div>
+    {% endif %}
+
+</div>
+
+
+
+    <!-- Карточка дополнительных информаций по объявлению-->
+    <div class="card shadow-sm border-0 rounded-4 p-4 mb-5">
+
+        <h2 class="fw-bold">
+            {{ ad.title }}
+        </h2>
+        {% if is_already_in_saved %}
+            <form method="POST" action="{% url 'main:delete_favorite_ad' ad.pk %}">
+                {% csrf_token %}
+                <input class="btn btn-danger" type="submit" value="Remove from Favorites">
+            </form>
+        {% else %}
+            <form method="POST" action="{% url 'main:save_favorite_ad' ad.pk %}">
+                {% csrf_token %}
+                <input class="btn btn-success" type="submit" value="Save in Favorites">
+            </form>
+        {% endif %}
+
+
+        <h3 class="text-success fw-bold mb-4">
+            {{ ad.price|intcomma }} сум
+        </h3>
+
+        <h4 class="fw-semibold mb-3">
+            Описание
+        </h4>
+
+        <p class="text-muted">
+            {{ ad.description }}
+        </p>
+
+        <hr>
+
+        <h4 class="fw-semibold mb-3">
+            Контактная информация
+        </h4>
+
+        <p><strong>Категория:</strong> {{ ad.category }}</p>
+
+        <p><strong>Контактное лицо:</strong> {{ ad.contact_person }}</p>
+
+        <p><strong>Email:</strong> {{ ad.email }}</p>
+
+        <p><strong>Телефон:</strong> {{ ad.phone }}</p>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

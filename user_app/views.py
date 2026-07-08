@@ -1,6 +1,8 @@
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect, render
+
+from main.forms import RegisterForm
 
 # render → показывает HTML страницу пользователю
 # redirect → отправляет пользователя на другой URL
@@ -23,7 +25,7 @@ def register_view(request):
     if request.method == "POST":
         # POST = пользователь отправил форму (нажал кнопку "зарегистрироваться")
 
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         # создаём форму и передаём туда данные, которые ввёл пользователь
 
         if form.is_valid():
@@ -44,7 +46,7 @@ def register_view(request):
     else:
         # GET = пользователь просто открыл страницу регистрации
 
-        form = UserCreationForm()
+        form = RegisterForm()
         # пустая форма (чтобы показать поля)
 
     return render(request, "user_app/register.html", {"form": form})

@@ -1,44 +1,45 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark px-3">
 
-    <a class="navbar-brand" href="{% url 'home' %}">
+    <a class="navbar-brand me-5" href="{% url 'home' %}">
         BuySell.com
     </a>
 
 
-    <div class="mx-auto">
-        <a class="btn btn-light text-dark btn-lg fw-bold shadow" href="{% url 'main:my_ads' %}">
+
+
+    <div class="ms-auto d-flex align-items-center gap-3">
+        
+
+        <a class="text-light fs-5 ms-5"
+           href="{% url 'main:my_ads' %}">
             Мои объявления
         </a>
-    </div>
 
+        <a class="btn btn-light text-dark btn-lg fw-bold shadow rounded-0 me-5"
+           href="{% url 'main:create_ad' %}">
+            Подать объявление
+        </a>
 
-<div class="ms-auto">
-    <a class="btn btn-light text-dark btn-lg fw-bold shadow ms-5" href="{% url 'main:create_ad' %}">
-        Подать объявление
-    </a>
-</div>
-
-
-
-    <div class="ms-auto">
+        <a class="navbar-heart-favorites"
+           href="{% url 'main:saved_ads' %}">
+             ♡
+        </a>
 
         {% if user.is_authenticated %}
 
-            <span class="text-white me-3">
+            <span class="text-white ms-3">
                 Привет, {{ user.username }}
-                ты зашёл успешно
-
             </span>
 
             <a href="{% url 'user_app:logout' %}"
-               class="btn btn-outline-light btn-sm">
+               class="btn btn-outline-light btn-lg rounded-1">
                 Выйти
             </a>
 
         {% else %}
 
             <a href="{% url 'user_app:login' %}"
-               class="btn btn-primary">
+               class="btn btn-light text-dark text-decoration-none btn-lg fs-6 fw-bold rounded-5">
                 Войти
             </a>
 
@@ -46,4 +47,32 @@
 
     </div>
 
+
 </nav>
+
+
+
+
+<div class="py-3 shadow" style="background-color: #e9ecef;">
+
+    <div class="container-fluid px-4 px-lg-5">
+
+        <form class="d-flex" action="{% url 'main:home' %}" method="GET">
+
+            <input
+                class="form-control me-1 rounded-1"
+                style="min-width: 1200px; min-height: 68px; border: #e8e2d8;"
+                type="search"
+                name="q"
+                placeholder="Что ищете?"
+                value="{{ request.GET.q|default:'' }}">
+
+            <button class="btn btn-dark rounded-1 fs-5 fw-semibold" type="submit" style="min-width: 130px; min-height: 40px;">
+                Поиск   ⌕
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
