@@ -23,9 +23,9 @@
 
                     <div class="image-top-list" style="height:220px;">
 
-                        {% if ad.image_1 %}
+                        {% if ad.images %}
     <img
-        src="{{ ad.image_1.url }}"
+        src="{{ ad.images.url }}"
         alt="{{ ad.title }}"
         style="width:100%; height:100%; object-fit:cover;"
     >
@@ -43,13 +43,26 @@
                             Номер: {{ ad.phone }}
                         </p>
 
-                        <div class="mt-auto">
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+
                             <h5 class="fw-bold mb-0">
                                 {{ ad.price|intcomma }} сум
                             </h5>
+
+
+                                <form method="POST" action="{% url 'main:delete_favorite_ad' ad.pk %}">
+                                    {% csrf_token %}
+                                   <input type="hidden" name="redirect_to" value="saved_ads">
+                                    <input class="favorite-btn" type="submit" value="♥">
+                                </form>
+
+
+
+
                         </div>
 
-<!--                    -->
+
+
 
                     </div>
 

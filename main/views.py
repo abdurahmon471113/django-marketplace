@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import AdvertisementForm
@@ -21,7 +21,7 @@ def ad_detail_view(request, pk):
     is_already_in_saved = SavedAd.objects.filter(user=request.user, advertisement=ad)
     return render(
         request,
-        "main/ad_detail.html",
+        "main/ad-detail.html",
         {"ad": ad, "is_already_in_saved": is_already_in_saved},
     )
 
@@ -41,7 +41,7 @@ def create_ad_view(request):
     else:
         form = AdvertisementForm(user=request.user)
 
-    return render(request, "main/create_ad.html", {"form": form})
+    return render(request, "main/create-ad.html", {"form": form})
 
 
 @login_required
@@ -51,8 +51,6 @@ def change_ad_view(request, pk):
         form = AdvertisementForm(
             request.POST, request.FILES, instance=ad, user=request.user
         )
-        print(request.FILES)
-
         if form.is_valid():
             form.save()
             return redirect("main:my_ads")
@@ -60,7 +58,7 @@ def change_ad_view(request, pk):
     else:
         form = AdvertisementForm(instance=ad, user=request.user)
 
-    return render(request, "main/change_ad.html", {"form": form})
+    return render(request, "main/change-ad.html", {"form": form})
 
 
 @login_required
@@ -71,22 +69,29 @@ def delete_ad_view(request, pk):
 
 
 def home_view(request):
-    others = Advertisement.objects.all()
+    ads = Advertisement.objects.all()
     query = request.GET.get("q")
     if request.user.is_authenticated:
-        others = others.exclude(author=request.user)
+        ads = ads.exclude(author=request.user)
 
     if query:
-        others = others.filter(
+        ads = ads.filter(
             Q(title__icontains=query) | Q(description__icontains=query)
         )
-    return render(request, "main/home.html", {"others": others})
+
+    if not request.user.is_authenticated:
+        return render(request, "main/home.html", {"ads": ads})
+
+    is_already_in_saved = SavedAd.objects.filter(user=request.user, advertisement=OuterRef("pk")).values("id")[:1]
+
+    ads = ads.annotate(is_already_in_saved=Subquery(is_already_in_saved))
+    
+    return render(request, "main/home.html", {"ads": ads})
 
 
 @login_required
 def saved_ads_view(request):
-    ad_ids = SavedAd.objects.filter(user=request.user).values_list("advertisement__id")
-    print("ad_ids", ad_ids)
+    ad_ids = SavedAd.objects.filter(user=request.user).values_list("advertisement__id", flat=True)
     ads = Advertisement.objects.filter(id__in=ad_ids)
     return render(request, "main/favorites.html", {"ads": ads})
 
@@ -94,17 +99,24 @@ def saved_ads_view(request):
 @login_required
 def save_favorite_ad(request, pk):
     if request.method == "POST":
+        redirect_to = request.POST.get("redirect_to")
         user = request.user
         ad = get_object_or_404(Advertisement, pk=pk)
         SavedAd.objects.create(user=user, advertisement=ad)
-        return redirect("main:ad_detail", pk=pk)
+        if redirect_to == "home" or redirect_to == "favorites":
+            return redirect(f"main:{redirect_to}")
+        return redirect(f"main:{redirect_to}", pk=pk)
 
 
 @login_required
 def delete_favorite_ad(request, pk):
     if request.method == "POST":
+        redirect_to = request.POST.get("redirect_to")
         user = request.user
         ad = get_object_or_404(Advertisement, pk=pk)
         delete_ad = SavedAd.objects.filter(user=user, advertisement=ad)
         delete_ad.delete()
-        return redirect("main:ad_detail", pk=pk)
+        if redirect_to == "home" or redirect_to == "saved_ads":
+            return redirect(f"main:{redirect_to}")
+        return redirect(f"main:{redirect_to}", pk=pk)
+

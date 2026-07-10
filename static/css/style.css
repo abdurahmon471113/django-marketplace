@@ -120,3 +120,34 @@ body {
     background-color: rgba(255, 255, 255, 0.15);
     color: white;
 }
+
+
+
+.favorite-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 0px solid #d9d9d9;
+
+    background-color: white;
+
+    font-size: 35px;
+    color: #002f34;
+
+    text-decoration: none;
+
+    transition: all 0.2s ease;
+}
+
+.favorite-btn:hover {
+    background-color: #f2f4f5;
+    color: #002f34;
+}
+
+.favorite-btn:active {
+    transform: scale(0.95);
+}

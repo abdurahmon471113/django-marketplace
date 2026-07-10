@@ -45,4 +45,4 @@ class SavedAd(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.user.email} user saved ad {self.advertisement.id}"
+        return f"({self.id}) {self.user.email} user saved ad {self.advertisement.id}"
