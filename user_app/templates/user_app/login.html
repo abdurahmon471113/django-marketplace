@@ -2,15 +2,43 @@
 {% block title %}Вход{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-center align-items-center card shadow rounded card-w-50 h-28" style="min-height: 80vh;">
-    <div class="col-md-5 auth-card">
-        <h3>Войти в аккаунт</h3>
-        <form method="post">
+
+<div class="container d-flex justify-content-center align-items-center"
+     style="min-height: 80vh;">
+
+    <div class="card shadow p-5 rounded-4" style="width: 500px;">
+
+        <h1 class="fw-bold mb-2">Войти в аккаунт</h1>
+
+        <p class="text-muted mb-4">
+            Войдите для доступа к вашим объявлениям
+        </p>
+
+        <form method="POST">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary w-100 mt-3">Войти</button>
+
+            <div class="mb-3">
+                {{ form.username }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.password }}
+            </div>
+
+            <button type="submit" class="btn btn-dark text-light w-100 py-3 rounded-pill">
+                Войти
+            </button>
         </form>
-        <p>Нет аккаунта? <a href="{% url 'user_app:register' %}">Зарегистрироваться</a></p>
+
+        <div class="mt-4 text-center">
+            Нет аккаунта?
+            <a href="{% url 'user_app:register' %}">
+                Зарегистрироваться
+            </a>
+        </div>
+
     </div>
+
 </div>
+
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Subquery, OuterRef
+from django.db.models import Q, Subquery, OuterRef, Count
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import AdvertisementForm
@@ -85,7 +85,6 @@ def home_view(request):
     ).values("id")[:1]
 
     ads = ads.annotate(is_already_in_saved=Subquery(is_already_in_saved))
-
     return render(request, "main/home.html", {"ads": ads})
 
 
