@@ -12,6 +12,10 @@ urlpatterns = [
     path("delete-ad/<int:pk>/", views.delete_ad_view, name="delete_ad"),
     path("create-ad/", views.create_ad_view, name="create_ad"),
     path("save-favorite-ad/<int:pk>/", views.save_favorite_ad, name="save_favorite_ad"),
-    path("delete-favorite-ad/<int:pk>/", views.delete_favorite_ad, name="delete_favorite_ad"),
+    path(
+        "delete-favorite-ad/<int:pk>/",
+        views.delete_favorite_ad,
+        name="delete_favorite_ad",
+    ),
     path("saved/", views.saved_ads_view, name="saved_ads"),
 ]

@@ -75,23 +75,25 @@ def home_view(request):
         ads = ads.exclude(author=request.user)
 
     if query:
-        ads = ads.filter(
-            Q(title__icontains=query) | Q(description__icontains=query)
-        )
+        ads = ads.filter(Q(title__icontains=query) | Q(description__icontains=query))
 
     if not request.user.is_authenticated:
         return render(request, "main/home.html", {"ads": ads})
 
-    is_already_in_saved = SavedAd.objects.filter(user=request.user, advertisement=OuterRef("pk")).values("id")[:1]
+    is_already_in_saved = SavedAd.objects.filter(
+        user=request.user, advertisement=OuterRef("pk")
+    ).values("id")[:1]
 
     ads = ads.annotate(is_already_in_saved=Subquery(is_already_in_saved))
-    
+
     return render(request, "main/home.html", {"ads": ads})
 
 
 @login_required
 def saved_ads_view(request):
-    ad_ids = SavedAd.objects.filter(user=request.user).values_list("advertisement__id", flat=True)
+    ad_ids = SavedAd.objects.filter(user=request.user).values_list(
+        "advertisement__id", flat=True
+    )
     ads = Advertisement.objects.filter(id__in=ad_ids)
     return render(request, "main/favorites.html", {"ads": ads})
 
@@ -119,4 +121,3 @@ def delete_favorite_ad(request, pk):
         if redirect_to == "home" or redirect_to == "saved_ads":
             return redirect(f"main:{redirect_to}")
         return redirect(f"main:{redirect_to}", pk=pk)
-
