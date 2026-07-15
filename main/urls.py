@@ -18,4 +18,5 @@ urlpatterns = [
         name="delete_favorite_ad",
     ),
     path("saved/", views.saved_ads_view, name="saved_ads"),
+    path("archive-ad/<int:pk>/", views.archive_ad_view, name="archive_ad"),
 ]

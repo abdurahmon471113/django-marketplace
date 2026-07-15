@@ -21,14 +21,27 @@ class Category(BaseModel):
         return self.name
 
 
+class SubCategory(BaseModel):
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, blank=True, null=True
+    )
+    name = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Advertisement(BaseModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    subcategory = models.ForeignKey(
+        SubCategory, on_delete=models.CASCADE, blank=True, null=True
+    )
     title = models.CharField(max_length=150)
     price = models.DecimalField(max_digits=12, decimal_places=0)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
     status = models.CharField(
-        max_length=250, choices=StatusChoices.choices, default=StatusChoices.ACTIVE
+        max_length=250, choices=StatusChoices.choices, default=StatusChoices.WAITING
     )
     images = models.ImageField(upload_to="images/", blank=True, null=True)
 

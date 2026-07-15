@@ -1,13 +1,7 @@
 from django.contrib.auth import login, logout
 from django.shortcuts import redirect, render
 
-from .forms import RegisterForm
-from .forms import LoginForm
-
-
-
-
-
+from .forms import LoginForm, RegisterForm
 
 
 def register_view(request):
@@ -22,10 +16,6 @@ def register_view(request):
     return render(request, "user_app/register.html", {"form": form})
 
 
-
-
-
-
 def login_view(request):
     form = LoginForm(request, data=request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -33,11 +23,6 @@ def login_view(request):
         login(request, user)
         return redirect("home")
     return render(request, "user_app/login.html", {"form": form})
-
-
-
-
-
 
 
 def logout_view(request):

@@ -10,9 +10,43 @@
         Объявления пользователя {{ user.username }}
     </h1>
 
-     <h3 class="fw-semibold mb-4">
-    У {{ user.username }} {{ ads_count }} объявлений
-    </h3>
+     <h3 class="fw-semibold mb-4 text-danger">
+         {% if current_status == "active" %}
+                  У {{ user.username }} {{ ads_count }} активных объявлений
+         {% elif current_status == "waiting" %}
+                  У {{ user.username }} {{ ads_count }} ожидающих объявлений
+         {% elif current_status == "archived" %}
+                  У {{ user.username }} {{ ads_count }} объявлений в архиве
+         {% elif current_status == "rejected" %}
+                  У {{ user.username }} {{ ads_count }} отклонённых объявлений
+
+         {% endif %}
+     </h3>
+
+<div class="d-flex border-bottom mb-4 gap-3">
+
+    <a href="?status=active"
+       class="p-3 text-decoration-none {% if current_status == 'active' %}fw-bold text-dark border-bottom border-3 border-dark{% endif %}">
+        Активные
+    </a>
+
+    <a href="?status=waiting"
+       class="p-3 text-decoration-none {% if current_status == 'waiting' %}fw-bold text-dark border-bottom border-3 border-dark{% endif %}">
+        Ожидающие
+    </a>
+
+    <a href="?status=archived"
+       class="p-3 text-decoration-none {% if current_status == 'archived' %}fw-bold text-dark border-bottom border-3 border-dark{% endif %}">
+        Архив
+    </a>
+
+    <a href="?status=rejected"
+       class="p-3 text-decoration-none {% if current_status == 'rejected' %}fw-bold text-dark border-bottom border-3 border-dark{% endif %}">
+        Отклонённые
+    </a>
+
+</div>
+
 
     {% for ad in my_ads %}
 
@@ -22,9 +56,9 @@
 
             <div style="max-width:75%;">
 
-                {% if ad.image_1 %}
+                {% if ad.images %}
                     <img
-                        src="{{ ad.image_1.url }}"
+                        src="{{ ad.images.url }}"
                         alt="{{ ad.title }}"
                         class="rounded mb-3"
                         style="width:260px; height:190px; object-fit:cover;"
@@ -70,25 +104,41 @@
                    class="btn btn-outline-dark mb-2">
                     ✏️ Редактировать
                 </a>
+                
 
                 <a href="{% url 'main:delete_ad' ad.pk %}"
-                   class="btn btn-outline-danger">
+                   class="btn btn-outline-danger mb-2">
                     🗑 Удалить
                 </a>
+
+                {% if current_status == "active" %}
+
+                  <a href="{% url 'main:archive_ad' ad.pk %}"
+                   class="btn btn-outline-primary text-dark">
+                    Добавить в архив
+                </a>
+
+
+                {% elif current_status == "archived" %}
+
+                  <a href="{% url 'main:archive_ad' ad.pk %}"
+                   class="btn btn-outline-warning text-dark">
+                    Вывести из архива
+                </a>
+
+
+                {% endif %}
+
+
+
 
             </div>
 
         </div>
 
     </div>
-
-    {% empty %}
-
-        <div class="alert alert-info">
-            У вас пока нет объявлений.
-        </div>
-
     {% endfor %}
+
 
 </div>
 {% endblock %}

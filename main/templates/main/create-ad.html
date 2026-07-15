@@ -32,6 +32,16 @@
               <p class="error">{{ error }}</p>
             {% endfor %}
         </div>
+
+        <h6 class="text-muted">Вы можете выбрать подкатегорию снизу</h6>
+        
+         <div class="form-group mt-3">
+            {{ form.subcategory.label_tag }}
+            {{ form.subcategory }}
+            {% for error in form.subcategory.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
     </div>
 
 

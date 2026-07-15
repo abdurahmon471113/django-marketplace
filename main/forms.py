@@ -9,6 +9,7 @@ class AdvertisementForm(forms.ModelForm):
         model = Advertisement
         fields = [
             "category",
+            "subcategory",
             "title",
             "price",
             "description",
@@ -20,17 +21,23 @@ class AdvertisementForm(forms.ModelForm):
 
         labels = {
             "category": "Категория",
+            "subcategory": "Подкатегория",
             "title": "Укажите название",
             "price": "Цена",
             "description": "Описание",
             "contact_person": "Контактное лицо",
             "email": "Email-адрес",
             "phone": "Номер телефона",
-            "image": "Фото",
+            "images": "Фото",
         }
 
         widgets = {
             "category": forms.Select(
+                attrs={
+                    "class": "widget-base-dimension widget_category form-select rounded-1 border-0"
+                }
+            ),
+            "subcategory": forms.Select(
                 attrs={
                     "class": "widget-base-dimension widget_category form-select rounded-1 border-0"
                 }
@@ -92,13 +99,11 @@ class AdvertisementForm(forms.ModelForm):
         if value <= 0:
             raise ValidationError("Цена должна быть больше 0.")
 
-
-
     def save(self, commit=True):
-        user = super().save(commit=False)
-        user.email = self.cleaned_data["email"]
+        ad = super().save(commit=False)
+        ad.email = self.cleaned_data["email"]
 
         if commit:
-            user.save()
+            ad.save()
 
-        return user
+        return ad

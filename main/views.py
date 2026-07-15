@@ -1,18 +1,39 @@
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Subquery, OuterRef, Count
+from django.db.models import OuterRef, Q, Subquery
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .choices import StatusChoices
 from .forms import AdvertisementForm
-from .models import Advertisement, SavedAd
+from .models import Advertisement, SavedAd, SubCategory
 
 
 @login_required
 def my_ads_list_view(request):
-    my_ads = Advertisement.objects.filter(author=request.user).order_by("-created_at")
-    ads_count = my_ads.count()
-    return render(
-        request, "main/my-ads-list.html", {"my_ads": my_ads, "ads_count": ads_count}
+    status = request.GET.get("status", StatusChoices.ACTIVE)
+    print("Текущий статус----", request.GET)
+    my_ads = Advertisement.objects.filter(author=request.user, status=status).order_by(
+        "-created_at"
     )
+    ads_count = my_ads.count()
+    print("Кол-во объявлений---", ads_count)
+    return render(
+        request,
+        "main/my-ads-list.html",
+        {"my_ads": my_ads, "ads_count": ads_count, "current_status": status},
+    )
+
+
+@login_required
+def archive_ad_view(request, pk):
+    ad = get_object_or_404(Advertisement, author=request.user, pk=pk)
+    if ad.status == StatusChoices.ACTIVE:
+        ad.status = StatusChoices.ARCHIVED
+        ad.save()
+        print("После клика изм с ACTIVE на ARCHIVED---", ad)
+    else:
+        ad.status = StatusChoices.ACTIVE
+        ad.save()
+    return redirect("main:my_ads")
 
 
 @login_required
@@ -30,6 +51,7 @@ def ad_detail_view(request, pk):
 def create_ad_view(request):
     if request.method == "POST":
         form = AdvertisementForm(request.POST, request.FILES, user=request.user)
+
         if form.is_valid():
             ad = form.save(commit=False)
             ad.author = request.user
@@ -69,7 +91,7 @@ def delete_ad_view(request, pk):
 
 
 def home_view(request):
-    ads = Advertisement.objects.all()
+    ads = Advertisement.objects.filter(status=StatusChoices.ACTIVE)
     query = request.GET.get("q")
     if request.user.is_authenticated:
         ads = ads.exclude(author=request.user)

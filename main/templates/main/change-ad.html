@@ -25,14 +25,25 @@
             {% endfor %}
           </div>
 
-        <div class="form-group">
-            <label for="category" class="form-label">{{ form.category.label_tag }}</label>
-            <p>{{ form.category }}</p>
+       <div class="form-group mt-3">
+            {{ form.category.label_tag }}
+            {{ form.category }}
             {% for error in form.category.errors %}
               <p class="error">{{ error }}</p>
             {% endfor %}
-          </div>
         </div>
+
+        <h6 class="text-muted">Вы можете изменить подкатегорию снизу</h6>
+
+         <div class="form-group mt-3">
+            {{ form.subcategory.label_tag }}
+            {{ form.subcategory }}
+            {% for error in form.subcategory.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </div>
+   
 
 
 
