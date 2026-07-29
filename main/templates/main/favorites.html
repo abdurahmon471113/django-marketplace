@@ -14,68 +14,130 @@
     <div class="row g-2">
 
         {% for ad in ads %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 ad-grid-item" id="ad-card-{{ ad.pk }}">
 
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card h-100 border-0 rounded-0 shadow" style="min-height:380px; min-width:289px;">
 
-            <a href="{% url 'main:ad_detail' ad.pk %}" class="cursor-link-ad_detail">
-
-                <div class="card h-100 border-0 rounded-0 shadow" style="min-height:380px; min-width:289px;">
-
+                <a href="{% url 'main:ad_detail' ad.pk %}" class="cursor-link-ad_detail text-decoration-none text-dark">
                     <div class="image-top-list" style="height:220px;">
-
                         {% if ad.images %}
-    <img
-        src="{{ ad.images.url }}"
-        alt="{{ ad.title }}"
-        style="width:100%; height:100%; object-fit:cover;"
-    >
-{% endif %}
-
+                            <img src="{{ ad.images.url }}" alt="{{ ad.title }}" style="width:100%; height:100%; object-fit:cover;">
+                        {% endif %}
                     </div>
+                </a>
 
-                    <div class="card-body d-flex flex-column">
-
+                <div class="card-body d-flex flex-column">
+                    
+                    <a href="{% url 'main:ad_detail' ad.pk %}" class="cursor-link-ad_detail text-decoration-none text-dark">
                         <h5 class="fw-semibold fs-6 mb-3">
                             {{ ad.title }}
                         </h5>
+                    </a>
 
-                        <p class="text-muted small mb-4">
-                            Номер: {{ ad.phone }}
-                        </p>
+                    <p class="text-muted small mb-4">
+                        Номер: {{ ad.phone }}
+                    </p>
 
-                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <div class="mt-auto d-flex justify-content-between align-items-center">
 
-                            <h5 class="fw-bold mb-0">
-                                {{ ad.price|intcomma }} сум
-                            </h5>
+                        <h5 class="fw-bold mb-0">
+                            {{ ad.price|intcomma }} сум
+                        </h5>
 
-
-                                <form method="POST" action="{% url 'main:delete_favorite_ad' ad.pk %}">
-                                    {% csrf_token %}
-                                   <input type="hidden" name="redirect_to" value="saved_ads">
-                                    <input class="favorite-btn" type="submit" value="♥">
-                                </form>
-
-
-
-
-                        </div>
-
-
-
+                        <!-- ИСПРАВЛЕНО: Добавили класс favorite-ajax-form для JavaScript -->
+                        <form class="favorite-ajax-form" method="POST" action="{% url 'main:delete_favorite_ad' ad.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="redirect_to" value="saved_ads">
+                            <input class="favorite-ajax-btn" type="submit" value="♥" data-id="{{ ad.pk }}" data-url="{% url 'main:delete_favorite_ad_ajax' ad.pk %}">
+                        </form>
 
                     </div>
 
                 </div>
 
-            </a>
+            </div>
 
         </div>
-
+        {% empty %}
+        <!-- Бонус: Если избранных объявлений нет -->
+        <div class="col-12 text-center text-muted py-5">
+            <p>У вас пока нет избранных объявлений.</p>
+        </div>
         {% endfor %}
 
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим все формы удаления на странице
+        const favoriteForms = document.querySelectorAll('.favorite-ajax-form');
+    
+        favoriteForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                // 1. Останавливаем стандартную перезагрузку страницы
+                event.preventDefault(); 
+    
+                // 2. Получаем ID объявления из кнопки внутри этой формы
+                const submitBtn = this.querySelector('.favorite-ajax-btn');
+                const adId = submitBtn.getAttribute('data-id');
+                
+                // 3. Забираем CSRF-токен из формы
+                const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                // 4. URL вашего НОВОГО AJAX View для удаления (проверьте этот путь у себя)
+                const url = submitBtn.getAttribute('data-url'); // НОВЫЙ ВАРИАНТ
+    
+                // Выключаем кнопку на время запроса, чтобы пользователь не кликал дважды
+                submitBtn.disabled = true;
+    
+                // 5. Отправляем AJAX запрос
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({
+                        message: `Удаление объявления ${adId} из избранного`
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка сервера при удалении');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        // 6. Находим всю колонку Bootstrap по её уникальному ID
+                        const adCard = document.getElementById(`ad-card-${adId}`);
+                        if (adCard) {
+                            // Эффект плавного исчезновения всей карточки
+                            adCard.style.transition = 'all 0.4s ease';
+                            adCard.style.opacity = '0';
+                            adCard.style.transform = 'scale(0.9)';
+                            
+                            // Полностью убираем элемент из сетки после завершения анимации
+                            setTimeout(() => {
+                                adCard.remove();
+                            }, 400);
+                        }
+                    } else {
+                        submitBtn.disabled = false;
+                        alert('Ошибка: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    submitBtn.disabled = false;
+                    alert('Не удалось удалить объявление. Попробуйте еще раз.');
+                });
+            });
+        });
+    });
+    </script>
+    
 
 {% endblock %}

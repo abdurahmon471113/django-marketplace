@@ -9,7 +9,6 @@ class AdvertisementForm(forms.ModelForm):
         model = Advertisement
         fields = [
             "category",
-            "subcategory",
             "title",
             "price",
             "description",
@@ -20,8 +19,6 @@ class AdvertisementForm(forms.ModelForm):
         ]
 
         labels = {
-            "category": "Категория",
-            "subcategory": "Подкатегория",
             "title": "Укажите название",
             "price": "Цена",
             "description": "Описание",
@@ -32,16 +29,6 @@ class AdvertisementForm(forms.ModelForm):
         }
 
         widgets = {
-            "category": forms.Select(
-                attrs={
-                    "class": "widget-base-dimension widget_category form-select rounded-1 border-0"
-                }
-            ),
-            "subcategory": forms.Select(
-                attrs={
-                    "class": "widget-base-dimension widget_category form-select rounded-1 border-0"
-                }
-            ),
             "title": forms.TextInput(
                 attrs={"class": "widget_title form-control rounded-1 border-dark"}
             ),

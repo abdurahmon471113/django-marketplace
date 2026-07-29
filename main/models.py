@@ -16,16 +16,9 @@ class BaseModel(models.Model):
 
 class Category(BaseModel):
     name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-
-class SubCategory(BaseModel):
-    category = models.ForeignKey(
-        Category, on_delete=models.CASCADE, blank=True, null=True
+    parent = models.ForeignKey(
+        "self", related_name="children", on_delete=models.CASCADE, blank=True, null=True
     )
-    name = models.CharField(max_length=100, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -33,9 +26,6 @@ class SubCategory(BaseModel):
 
 class Advertisement(BaseModel):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    subcategory = models.ForeignKey(
-        SubCategory, on_delete=models.CASCADE, blank=True, null=True
-    )
     title = models.CharField(max_length=150)
     price = models.DecimalField(max_digits=12, decimal_places=0)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -50,7 +40,7 @@ class Advertisement(BaseModel):
     phone = PhoneNumberField(blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return f"(id: {self.id}) {self.author}"
 
 
 class SavedAd(BaseModel):

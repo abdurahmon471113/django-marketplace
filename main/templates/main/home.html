@@ -15,9 +15,9 @@
 
         {% for ad in ads %}
 
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3" id="ad-card-{{ ad.pk }}">
 
-            <a href="{% url 'main:ad_detail' ad.pk %}" class="cursor-link-ad_detail">
+            <a href="{% url 'main:ad_detail' ad.pk %}" class="cursor-link-ad_detail text-decoration-none text-dark">
 
                 <div class="card h-100 border-0 rounded-0 shadow" style="min-height:380px; min-width:289px;">
 
@@ -53,16 +53,16 @@
                             {% if user.is_authenticated %}
 
     {% if ad.is_already_in_saved %}
-        <form method="POST" action="{% url 'main:delete_favorite_ad' ad.pk %}">
+        <form class="favorite-ajax-form" method="POST" action="{% url 'main:delete_favorite_ad' ad.pk %}">
             {% csrf_token %}
             <input type="hidden" name="redirect_to" value="home">
-            <input class="favorite-btn" type="submit" value="♥">
+            <input class="favorite-ajax-btn active" type="submit" value="♥" data-id="{{ ad.pk }}" data-save-url="{% url 'main:save_favorite_ad_ajax' ad.pk %}" data-delete-url="{% url 'main:delete_favorite_ad_ajax' ad.pk %}">
         </form>
     {% else %}
-        <form method="POST" action="{% url 'main:save_favorite_ad' ad.pk %}">
+        <form class="favorite-ajax-form" method="POST" action="{% url 'main:save_favorite_ad' ad.pk %}">
             {% csrf_token %}
             <input type="hidden" name="redirect_to" value="home">
-            <input class="favorite-btn" type="submit" value="♡">
+            <input class="favorite-ajax-btn" type="submit" value="♡" data-id="{{ ad.pk }}" data-save-url="{% url 'main:save_favorite_ad_ajax' ad.pk %}" data-delete-url="{% url 'main:delete_favorite_ad_ajax' ad.pk %}">
         </form>
     {% endif %}
                                 {% endif %}
@@ -84,5 +84,103 @@
     </div>
 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const favoriteForms = document.querySelectorAll('.favorite-ajax-form');
+    
+        favoriteForms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); 
+    
+                // Находим кнопку по правильному классу favorite-ajax-btn
+                const submitBtn = this.querySelector('.favorite-ajax-btn');
+                if (!submitBtn) {
+                    console.error('Ошибка: Кнопка с классом .favorite-ajax-btn не найдена в форме.');
+                    return;
+                }
+    
+                const adId = submitBtn.getAttribute('data-id');
+                const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                // Проверяем текущий статус (есть ли класс active)
+                const isFavorite = submitBtn.classList.contains('active');
+
+                
+                
+                // Выбираем правильный URL
+                const url = isFavorite 
+                    ? submitBtn.getAttribute('data-delete-url') 
+                    : submitBtn.getAttribute('data-save-url');
+
+    
+                if (!url) {
+                    alert('Критическая ошибка: Не найден URL для AJAX-запроса в атрибутах кнопки.');
+                    submitBtn.disabled = false;
+                    return;
+                }
+    
+                // Блокируем кнопку, чтобы избежать спам-кликов во время запроса
+                submitBtn.disabled = true;
+    
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ message: "toggle" })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Код ответа сервера: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        
+                        // Проверяем тип страницы (Избранное или Главная)
+                        const pageHeader = document.querySelector('h2');
+                        const isFavoritePage = pageHeader && pageHeader.innerText.includes('Избранные');
+    
+                        if (isFavoritePage) {
+                            // Если мы на странице Избранного — удаляем карточку товара
+                            const adCard = document.getElementById(`ad-card-${adId}`);
+                            if (adCard) {
+                                adCard.style.transition = 'all 0.4s ease';
+                                adCard.style.opacity = '0';
+                                adCard.style.transform = 'scale(0.9)';
+                                setTimeout(() => { adCard.remove(); }, 400);
+                            }
+                        } else {
+                            // Если мы на Главной странице — переключаем состояние кнопки туда-обратно
+                            if (isFavorite) {
+                                submitBtn.classList.remove('active');
+                                submitBtn.value = '♡'; // Снова становится пустым
+                            } else {
+                                submitBtn.classList.add('active');
+                                submitBtn.value = '♥'; // Становится полным
+                            }
+                            // ОБЯЗАТЕЛЬНО разблокируем кнопку для следующего клика
+                            submitBtn.disabled = false;
+                        }
+                        
+                    } else {
+                        submitBtn.disabled = false;
+                        alert('Ошибка бэкенда: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка AJAX:', error);
+                    submitBtn.disabled = false;
+                    alert('Не удалось изменить статус избранного. Проверьте консоль браузера.');
+                });
+            });
+        });
+    });
+    </script>
+    
+    
 
 {% endblock %}

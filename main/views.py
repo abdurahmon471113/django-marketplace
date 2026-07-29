@@ -1,21 +1,37 @@
+import json
+
+from django.http import JsonResponse
+
+from django.views.decorators.csrf import csrf_protect
+
 from django.contrib.auth.decorators import login_required
+
 from django.db.models import OuterRef, Q, Subquery
+
 from django.shortcuts import get_object_or_404, redirect, render
 
+from django.urls import reverse
+
+
+
+
 from .choices import StatusChoices
+
+
 from .forms import AdvertisementForm
-from .models import Advertisement, SavedAd, SubCategory
+
+from .models import Advertisement, Category, SavedAd
+
+
 
 
 @login_required
 def my_ads_list_view(request):
     status = request.GET.get("status", StatusChoices.ACTIVE)
-    print("Текущий статус----", request.GET)
     my_ads = Advertisement.objects.filter(author=request.user, status=status).order_by(
         "-created_at"
     )
     ads_count = my_ads.count()
-    print("Кол-во объявлений---", ads_count)
     return render(
         request,
         "main/my-ads-list.html",
@@ -29,7 +45,6 @@ def archive_ad_view(request, pk):
     if ad.status == StatusChoices.ACTIVE:
         ad.status = StatusChoices.ARCHIVED
         ad.save()
-        print("После клика изм с ACTIVE на ARCHIVED---", ad)
     else:
         ad.status = StatusChoices.ACTIVE
         ad.save()
@@ -49,8 +64,14 @@ def ad_detail_view(request, pk):
 
 @login_required
 def create_ad_view(request):
+    catg = Category.objects.filter(parent=None)
     if request.method == "POST":
-        form = AdvertisementForm(request.POST, request.FILES, user=request.user)
+        print("POST:", request.POST)
+        form = AdvertisementForm(
+            request.POST,
+            request.FILES,
+            user=request.user,
+        )
 
         if form.is_valid():
             ad = form.save(commit=False)
@@ -63,11 +84,12 @@ def create_ad_view(request):
     else:
         form = AdvertisementForm(user=request.user)
 
-    return render(request, "main/create-ad.html", {"form": form})
+    return render(request, "main/create-ad.html", {"form": form, "catg": catg})
 
 
 @login_required
 def change_ad_view(request, pk):
+    catg = Category.objects.filter(parent=None)
     ad = get_object_or_404(Advertisement, pk=pk, author=request.user)
     if request.method == "POST":
         form = AdvertisementForm(
@@ -80,14 +102,17 @@ def change_ad_view(request, pk):
     else:
         form = AdvertisementForm(instance=ad, user=request.user)
 
-    return render(request, "main/change-ad.html", {"form": form})
+    return render(request, "main/change-ad.html", {"form": form, "catg": catg})
 
 
 @login_required
 def delete_ad_view(request, pk):
     my_ads = Advertisement.objects.filter(author=request.user, pk=pk)
     my_ads.delete()
-    return redirect("main:my_ads")
+    return redirect(
+        reverse("main:my_ads") + "?status=waiting"
+    )  
+
 
 
 def home_view(request):
@@ -142,3 +167,59 @@ def delete_favorite_ad(request, pk):
         if redirect_to == "home" or redirect_to == "saved_ads":
             return redirect(f"main:{redirect_to}")
         return redirect(f"main:{redirect_to}", pk=pk)
+    
+
+
+@login_required
+def save_favorite_ad_ajax(request, pk):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            message = data.get("message", "Успешно добавлено")
+            user = request.user
+            ad = get_object_or_404(Advertisement, pk=pk)
+            SavedAd.objects.get_or_create(user=user, advertisement=ad)
+            
+            response_data = {
+                "status": "success",
+                "received_message": message
+            }
+            print("Всё успешно сработало----", response_data)
+            return JsonResponse(response_data)
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+            
+    return JsonResponse({"status": "error", "message": "Only POST requests allowed"}, status=405)
+
+
+
+@login_required
+def delete_favorite_ad_ajax(request, pk):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            message = data.get("message", "Успешно удалено")
+
+            user = request.user
+            ad = get_object_or_404(Advertisement, pk=pk)
+            delete_ad = SavedAd.objects.filter(user=user, advertisement=ad)
+            delete_ad.delete()
+            
+            response_data = {
+                "status": "success",
+                "received_message": message
+            }
+            return JsonResponse(response_data)
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+            
+    return JsonResponse({"status": "error", "message": "Only POST requests allowed"}, status=405)
+
+
+
+
+
+
+

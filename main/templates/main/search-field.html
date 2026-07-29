@@ -77,3 +77,24 @@
 </div>
 
 {% endblock %}
+
+
+
+
+ <div class="p-4 mb-3 card shadow border-0">
+        <h5 class="fw-bold mb-3">Опишите в подробностях</h5>
+
+        <div class="form-group mb-2">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {% for error in form.title.errors %}
+              <p class="error">{{ error }}</p>
+            {% endfor %}
+        </div>
+
+
+
+    </div>
+
+
+

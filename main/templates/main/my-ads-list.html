@@ -79,10 +79,15 @@
 
                 <hr>
 
-                <p class="mb-2">
-                    <strong>Категория:</strong> {{ ad.category }}
-                </p>
+               <p class="mb-2">
+    <strong>Категория:</strong>
 
+    {% if ad.category.parent %}
+        {{ ad.category.parent.name }} → {{ ad.category.name }}
+    {% else %}
+        {{ ad.category.name }}
+    {% endif %}
+</p>
                 <p class="mb-2">
                     <strong>Контактное лицо:</strong> {{ ad.contact_person }}
                 </p>
