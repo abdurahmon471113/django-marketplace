@@ -12,9 +12,21 @@ urlpatterns = [
     path("delete-ad/<int:pk>/", views.delete_ad_view, name="delete_ad"),
     path("create-ad/", views.create_ad_view, name="create_ad"),
     path("save-favorite-ad/<int:pk>/", views.save_favorite_ad, name="save_favorite_ad"),
-    path("delete-favorite-ad/<int:pk>/",views.delete_favorite_ad, name="delete_favorite_ad"),
+    path(
+        "delete-favorite-ad/<int:pk>/",
+        views.delete_favorite_ad,
+        name="delete_favorite_ad",
+    ),
     path("saved/", views.saved_ads_view, name="saved_ads"),
     path("archive-ad/<int:pk>/", views.archive_ad_view, name="archive_ad"),
-    path("favorite/save-ajax/<int:pk>/", views.save_favorite_ad_ajax, name="save_favorite_ad_ajax"),
-    path("favorite/delete-ajax/<int:pk>/", views.delete_favorite_ad_ajax, name="delete_favorite_ad_ajax"),
+    path(
+        "favorite/save-ajax/<int:pk>/",
+        views.save_favorite_ad_ajax,
+        name="save_favorite_ad_ajax",
+    ),
+    path(
+        "favorite/delete-ajax/<int:pk>/",
+        views.delete_favorite_ad_ajax,
+        name="delete_favorite_ad_ajax",
+    ),
 ]

@@ -1,28 +1,15 @@
 import json
 
+from django.contrib.auth.decorators import login_required
+from django.db.models import OuterRef, Q, Subquery
 from django.http import JsonResponse
-
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect
 
-from django.contrib.auth.decorators import login_required
-
-from django.db.models import OuterRef, Q, Subquery
-
-from django.shortcuts import get_object_or_404, redirect, render
-
-from django.urls import reverse
-
-
-
-
 from .choices import StatusChoices
-
-
 from .forms import AdvertisementForm
-
 from .models import Advertisement, Category, SavedAd
-
-
 
 
 @login_required
@@ -109,10 +96,7 @@ def change_ad_view(request, pk):
 def delete_ad_view(request, pk):
     my_ads = Advertisement.objects.filter(author=request.user, pk=pk)
     my_ads.delete()
-    return redirect(
-        reverse("main:my_ads") + "?status=waiting"
-    )  
-
+    return redirect(reverse("main:my_ads") + "?status=waiting")
 
 
 def home_view(request):
@@ -167,7 +151,6 @@ def delete_favorite_ad(request, pk):
         if redirect_to == "home" or redirect_to == "saved_ads":
             return redirect(f"main:{redirect_to}")
         return redirect(f"main:{redirect_to}", pk=pk)
-    
 
 
 @login_required
@@ -179,19 +162,19 @@ def save_favorite_ad_ajax(request, pk):
             user = request.user
             ad = get_object_or_404(Advertisement, pk=pk)
             SavedAd.objects.get_or_create(user=user, advertisement=ad)
-            
-            response_data = {
-                "status": "success",
-                "received_message": message
-            }
+
+            response_data = {"status": "success", "received_message": message}
             print("Всё успешно сработало----", response_data)
             return JsonResponse(response_data)
-        
-        except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
-            
-    return JsonResponse({"status": "error", "message": "Only POST requests allowed"}, status=405)
 
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {"status": "error", "message": "Invalid JSON"}, status=400
+            )
+
+    return JsonResponse(
+        {"status": "error", "message": "Only POST requests allowed"}, status=405
+    )
 
 
 @login_required
@@ -205,21 +188,15 @@ def delete_favorite_ad_ajax(request, pk):
             ad = get_object_or_404(Advertisement, pk=pk)
             delete_ad = SavedAd.objects.filter(user=user, advertisement=ad)
             delete_ad.delete()
-            
-            response_data = {
-                "status": "success",
-                "received_message": message
-            }
+
+            response_data = {"status": "success", "received_message": message}
             return JsonResponse(response_data)
-        
+
         except json.JSONDecodeError:
-            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
-            
-    return JsonResponse({"status": "error", "message": "Only POST requests allowed"}, status=405)
+            return JsonResponse(
+                {"status": "error", "message": "Invalid JSON"}, status=400
+            )
 
-
-
-
-
-
-
+    return JsonResponse(
+        {"status": "error", "message": "Only POST requests allowed"}, status=405
+    )
