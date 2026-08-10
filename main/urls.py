@@ -29,4 +29,5 @@ urlpatterns = [
         views.delete_favorite_ad_ajax,
         name="delete_favorite_ad_ajax",
     ),
+    path("my-ads-list-ajax", views.my_ads_list_ajax_view, name="my_ads_list_ajax")
 ]

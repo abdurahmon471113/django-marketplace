@@ -3,9 +3,10 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.db.models import OuterRef, Q, Subquery
 from django.http import JsonResponse
+from django.template.loader import render_to_string
+
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_protect
 
 from .choices import StatusChoices
 from .forms import AdvertisementForm
@@ -14,15 +15,24 @@ from .models import Advertisement, Category, SavedAd
 
 @login_required
 def my_ads_list_view(request):
-    status = request.GET.get("status", StatusChoices.ACTIVE)
-    my_ads = Advertisement.objects.filter(author=request.user, status=status).order_by(
-        "-created_at"
+
+    current_status = request.GET.get(
+        "status",
+        StatusChoices.ACTIVE
     )
-    ads_count = my_ads.count()
+
+    my_ads = Advertisement.objects.filter(
+        author=request.user,
+        status=current_status
+    ).order_by("-created_at")
+
     return render(
         request,
         "main/my-ads-list.html",
-        {"my_ads": my_ads, "ads_count": ads_count, "current_status": status},
+        {
+            "my_ads": my_ads,
+            "current_status": current_status
+        }
     )
 
 
@@ -200,3 +210,43 @@ def delete_favorite_ad_ajax(request, pk):
     return JsonResponse(
         {"status": "error", "message": "Only POST requests allowed"}, status=405
     )
+
+
+
+
+
+@login_required
+def my_ads_list_ajax_view(request):
+
+    if request.method != "GET":
+        return JsonResponse(
+            {
+                "status": "error",
+                "message": "Only GET requests allowed"
+            },
+            status=405
+        )
+
+    current_status = request.GET.get(
+        "status",
+        StatusChoices.ACTIVE
+    )
+
+    my_ads = Advertisement.objects.filter(
+        author=request.user,
+        status=current_status
+    ).order_by("-created_at")
+
+    html = render_to_string(
+        "main/partials/my_ads_cards.html",
+        {
+            "my_ads": my_ads,
+            "current_status": current_status,
+        },
+        request=request
+    )
+
+    return JsonResponse({
+        "html": html
+    })
+    

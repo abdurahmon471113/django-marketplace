@@ -99,6 +99,7 @@
                     console.error('Ошибка: Кнопка с классом .favorite-ajax-btn не найдена в форме.');
                     return;
                 }
+            
     
                 const adId = submitBtn.getAttribute('data-id');
                 const csrfToken = this.querySelector('[name=csrfmiddlewaretoken]').value;
@@ -112,6 +113,7 @@
                 const url = isFavorite 
                     ? submitBtn.getAttribute('data-delete-url') 
                     : submitBtn.getAttribute('data-save-url');
+                    console.log(url);
 
     
                 if (!url) {
