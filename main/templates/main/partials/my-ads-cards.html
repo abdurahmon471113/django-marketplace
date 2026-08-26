@@ -1,0 +1,143 @@
+{% load humanize %}
+
+{% for ad in my_ads %}
+
+<div class="ad-card">
+
+    <div class="d-flex justify-content-between">
+
+        <div style="max-width:75%;">
+
+            {% if ad.images %}
+
+                <img
+                    src="{{ ad.images.url }}"
+                    alt="{{ ad.title }}"
+                    class="rounded mb-3"
+                    style="
+                        width:260px;
+                        height:190px;
+                        object-fit:cover;
+                    "
+                >
+
+            {% endif %}
+
+
+            <h4 class="fw-bold mb-2">
+                {{ ad.title }}
+            </h4>
+
+
+            <h3 class="text-success fw-bold mb-3">
+                {{ ad.price|intcomma }} сум
+            </h3>
+
+
+            <p class="text-muted mb-3 description text-break">
+                {{ ad.description }}
+            </p>
+
+
+            <hr>
+
+
+            <p class="mb-2">
+
+                <strong>Категория:</strong>
+
+                {% if ad.category.parent %}
+
+                    {{ ad.category.parent.name }}
+                    →
+                    {{ ad.category.name }}
+
+                {% else %}
+
+                    {{ ad.category.name }}
+
+                {% endif %}
+
+            </p>
+
+
+            <p class="mb-2">
+                <strong>Email:</strong>
+                {{ ad.email }}
+            </p>
+
+
+            <p class="mb-0">
+                <strong>Телефон:</strong>
+                {{ ad.phone }}
+            </p>
+
+        </div>
+
+
+        <!-- =================================================
+             КНОПКИ
+             ================================================= -->
+
+        <div class="d-flex flex-column align-items-end">
+
+            <!-- РЕДАКТИРОВАТЬ -->
+
+            <a
+                href="{% url 'main:change_ad_ajax' ad.pk %}"
+                class="btn btn-outline-dark mb-2 edit-ad-button"
+            >
+                ✏️ Редактировать
+            </a>
+
+
+            <!-- УДАЛИТЬ -->
+
+            <a
+                href="{% url 'main:delete_ad_ajax' ad.pk %}"
+                class="btn btn-outline-danger mb-2 delete-ad-button"
+            >
+                🗑 Удалить
+            </a>
+
+
+            <!-- АРХИВ -->
+
+            {% if current_status == "active" %}
+
+                <a
+                    href="{% url 'main:archive_ad_ajax' ad.pk %}"
+                    class="btn btn-outline-primary text-dark to-archive-button"
+                >
+                    Добавить в архив
+                </a>
+
+
+            {% elif current_status == "archived" %}
+
+                <a
+                    href="{% url 'main:from_archive_ajax' ad.pk %}"
+                    class="btn btn-outline-warning text-dark from-archive-button"
+                >
+                    Вывести из архива
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <hr>
+
+</div>
+
+
+{% empty %}
+
+<p>
+    Объявлений пока нет.
+</p>
+
+{% endfor %}

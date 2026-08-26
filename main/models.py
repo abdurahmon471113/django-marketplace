@@ -40,7 +40,7 @@ class Advertisement(BaseModel):
     phone = PhoneNumberField(blank=True, null=True)
 
     def __str__(self):
-        return f"(id: {self.id}) {self.author}"
+        return f"(id: {self.id}), (author: {self.author}), (title of ad: {self.title})"
 
 
 class SavedAd(BaseModel):

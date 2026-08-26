@@ -5,108 +5,572 @@
 
 {% block content %}
 
-<h1 class="fw-bold mb-4">
-    Объявления пользователя {{ user.username }}
-</h1>
+{% csrf_token %}
 
+<div class="edit-form-container mt-4">
 
+    <h2 class="fw-bold mb-4">
+        Объявления пользователя {{ user.username }}
+    </h2>
 
-<div class="mb-4">
-
-    <a
-        href="{% url 'main:my_ads_list_ajax' %}?status=active"
-        class="status-link p-3 text-decoration-none
-        {% if current_status == 'active' %}
-            fw-bold text-dark border-bottom border-3 border-dark
-        {% endif %}"
-    >
-        Активные
-    </a>
-
-    <a
-        href="{% url 'main:my_ads_list_ajax' %}?status=waiting"
-        class="status-link p-3 text-decoration-none
-        {% if current_status == 'waiting' %}
-            fw-bold text-dark border-bottom border-3 border-dark
-        {% endif %}"
-    >
-        Ожидающие
-    </a>
-
-    <a
-        href="{% url 'main:my_ads_list_ajax' %}?status=archived"
-        class="status-link p-3 text-decoration-none
-        {% if current_status == 'archived' %}
-            fw-bold text-dark border-bottom border-3 border-dark
-        {% endif %}"
-    >
-        Архив
-    </a>
-
-    <a
-        href="{% url 'main:my_ads_list_ajax' %}?status=rejected"
-        class="status-link p-3 text-decoration-none
-        {% if current_status == 'rejected' %}
-            fw-bold text-dark border-bottom border-3 border-dark
-        {% endif %}"
-    >
-        Отклонённые
-    </a>
+    {% include 'main/partials/my-ads-content.html' %}
 
 </div>
 
-<div class="ads-container">
-    {% include 'main/partials/my_ads_cards.html' %}
-</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
 
-    const overallStatuses = document.querySelectorAll('.status-link');
-    const adsContainer = document.querySelector('.ads-container');
+    document.addEventListener('DOMContentLoaded', function () {
 
-    overallStatuses.forEach(function (status) {
+        // =========================================================
+        // ОСНОВНОЙ КОНТЕЙНЕР
+        // =========================================================
 
-        status.addEventListener('click', function (event) {
+        const container = document.querySelector('.edit-form-container');
+
+        if (!container) {
+            console.error('Не найден .edit-form-container');
+            return;
+        }
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+
+        // =========================================================
+        // СТАТУСЫ
+        // =========================================================
+
+        function initStatus() {
+
+            const statusButton = document.querySelectorAll('.status-link');
+
+            statusButton.forEach(function (status) {
+
+                status.addEventListener('click', function (event) {
+
+                    event.preventDefault();
+
+                    const url = status.getAttribute('href');
+
+                    fetch(url)
+                        .then(function (response) {
+
+                            if (!response.ok) {
+                                throw new Error('HTTP ошибка: ' + response.status);
+                            }
+
+                            return response.json();
+
+                        })
+                        .then(function (data) {
+
+                            if (data.status !== 'success') {
+                                throw new Error('Django вернул ошибку');
+                            }
+
+                            const content = document.querySelector('.ads-content-wrapper');
+
+                            if (!content) {
+                                console.error('Не найден .ads-content-wrapper');
+                                return;
+                            }
+
+                            content.outerHTML = data.content;
+
+                            initStatus();
+                            initEdit();
+                            initDelete();
+                            initToarchive();
+                            initRtoActive();
+
+                        })
+                        .catch(function (error) {
+
+                            console.error('Ошибка загрузки статуса:', error);
+
+                        });
+
+                });
+
+            });
+
+        }
+
+
+        // =========================================================
+        // РЕДАКТИРОВАНИЕ
+        // =========================================================
+
+        function initEdit() {
+
+            const editButton = document.querySelectorAll('.edit-ad-button');
+
+            editButton.forEach(function (edit) {
+
+                edit.addEventListener('click', function (event) {
+
+                    event.preventDefault();
+
+                    const url = edit.getAttribute('href');
+
+                    fetch(url)
+                        .then(function (response) {
+
+                            if (!response.ok) {
+                                throw new Error('HTTP ошибка: ' + response.status);
+                            }
+
+                            return response.json();
+
+                        })
+                        .then(function (data) {
+
+                            if (data.status !== 'success') {
+                                throw new Error('Django вернул ошибку');
+                            }
+
+                            container.innerHTML = data.edit;
+
+                        })
+                        .catch(function (error) {
+
+                            console.error('Ошибка открытия формы:', error);
+
+                        });
+
+                });
+
+            });
+
+        }
+
+
+        // =========================================================
+        // УДАЛЕНИЕ
+        // =========================================================
+
+        function initDelete() {
+
+            const deleteButton = document.querySelectorAll('.delete-ad-button');
+
+            deleteButton.forEach(function (deleteButton) {
+
+                deleteButton.addEventListener('click', function (event) {
+
+                    event.preventDefault();
+
+                    const url = deleteButton.getAttribute('href');
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
+                        .then(function (response) {
+
+                            if (!response.ok) {
+                                throw new Error('HTTP ошибка: ' + response.status);
+                            }
+
+                            return response.json();
+
+                        })
+                        .then(function (data) {
+
+                            if (data.status !== 'success') {
+                                throw new Error('Django вернул ошибку');
+                            }
+
+                            const card = deleteButton.closest('.ad-card');
+
+                            if (card) {
+                                card.remove();
+                            }
+
+                        })
+                        .catch(function (error) {
+
+                            console.error('Ошибка удаления:', error);
+
+                        });
+
+                });
+
+            });
+
+        }
+
+
+        // =========================================================
+        // В АРХИВ
+        // =========================================================
+
+        function initToarchive() {
+
+            const addtoArchive = document.querySelectorAll('.to-archive-button');
+
+            addtoArchive.forEach(function (archive) {
+
+                archive.addEventListener('click', function (event) {
+
+                    event.preventDefault();
+
+                    const url = archive.getAttribute('href');
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
+                        .then(function (response) {
+
+                            if (!response.ok) {
+                                throw new Error('HTTP ошибка: ' + response.status);
+                            }
+
+                            return response.json();
+
+                        })
+                        .then(function (data) {
+
+                            if (data.status !== 'success') {
+                                throw new Error('Django вернул ошибку');
+                            }
+
+                            const card = archive.closest('.ad-card');
+
+                            if (card) {
+                                card.remove();
+                            }
+
+                        })
+                        .catch(function (error) {
+
+                            console.error('Ошибка добавления в архив:', error);
+
+                        });
+
+                });
+
+            });
+
+        }
+
+
+        // =========================================================
+        // ВЫВЕСТИ ИЗ АРХИВА
+        // =========================================================
+
+        function initRtoActive() {
+
+            const returntoActive = document.querySelectorAll('.from-archive-button');
+
+            returntoActive.forEach(function (archive) {
+
+                archive.addEventListener('click', function (event) {
+
+                    event.preventDefault();
+
+                    const url = archive.getAttribute('href');
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken
+                        }
+                    })
+                        .then(function (response) {
+
+                            if (!response.ok) {
+                                throw new Error('HTTP ошибка: ' + response.status);
+                            }
+
+                            return response.json();
+
+                        })
+                        .then(function (data) {
+
+                            if (data.status !== 'success') {
+                                throw new Error('Django вернул ошибку');
+                            }
+
+                            const card = archive.closest('.ad-card');
+
+                            if (card) {
+                                card.remove();
+                            }
+
+                        })
+                        .catch(function (error) {
+
+                            console.error('Ошибка вывода из архива:', error);
+
+                        });
+
+                });
+
+            });
+
+        }
+
+
+        // =========================================================
+        // CLICK
+        // =========================================================
+
+        container.addEventListener('click', function (event) {
+
+
+            // =====================================================
+            // КАТЕГОРИЯ
+            // =====================================================
+
+            const categoryButton = event.target.closest('.category');
+
+            if (categoryButton) {
+
+                event.preventDefault();
+
+                const categoryId = categoryButton.dataset.categoryId;
+                const categoryName = categoryButton.dataset.categoryName;
+                const hasChildren = categoryButton.dataset.hasChildren;
+
+                const categoryInput = container.querySelector('#category-input');
+                const selectedCategoryButton = container.querySelector('#category-button');
+
+                const subcategoryButtons = container.querySelectorAll('.subcategory');
+                const subcategoryLists = container.querySelectorAll('.subcategory-list');
+
+                const categoryMessage = container.querySelector('.category-message');
+
+                if (!categoryInput || !selectedCategoryButton) {
+                    return;
+                }
+
+
+                // =================================================
+                // СОХРАНЯЕМ КАТЕГОРИЮ
+                // =================================================
+
+                categoryInput.value = categoryId;
+
+                selectedCategoryButton.textContent = categoryName;
+
+
+                // =================================================
+                // УБИРАЕМ ВЫДЕЛЕНИЕ ПОДКАТЕГОРИИ
+                // =================================================
+
+                subcategoryButtons.forEach(function (button) {
+
+                    button.classList.remove('selected-subcategory');
+
+                });
+
+
+                // =================================================
+                // СКРЫВАЕМ ВСЕ ПОДКАТЕГОРИИ
+                // =================================================
+
+                subcategoryLists.forEach(function (list) {
+
+                    list.style.display = 'none';
+
+                });
+
+
+                // =================================================
+                // ЕСЛИ ЕСТЬ ПОДКАТЕГОРИИ
+                // =================================================
+
+                if (hasChildren === 'True') {
+
+                    const subcategoryList = container.querySelector('#subcategory-' + categoryId);
+
+                    if (subcategoryList) {
+
+                        subcategoryList.style.display = 'block';
+
+                    }
+
+                }
+
+
+                if (categoryMessage) {
+
+                    categoryMessage.textContent = '✅ Вы выбрали категорию: ' + categoryName;
+
+                }
+
+
+                console.log('Выбрана категория:', categoryInput.value);
+
+                return;
+
+            }
+
+
+            // =====================================================
+            // ПОДКАТЕГОРИЯ
+            // =====================================================
+
+            const subcategoryButton = event.target.closest('.subcategory');
+
+            if (subcategoryButton) {
+
+                event.preventDefault();
+
+                const subcategoryId = subcategoryButton.dataset.categoryId;
+                const subcategoryName = subcategoryButton.dataset.categoryName;
+
+                const categoryInput = container.querySelector('#category-input');
+                const selectedCategoryButton = container.querySelector('#category-button');
+
+                const subcategoryButtons = container.querySelectorAll('.subcategory');
+                const subcategoryLists = container.querySelectorAll('.subcategory-list');
+
+                const categoryMessage = container.querySelector('.category-message');
+
+                if (!categoryInput || !selectedCategoryButton) {
+                    return;
+                }
+
+
+                // =================================================
+                // СОХРАНЯЕМ ПОДКАТЕГОРИЮ
+                // =================================================
+
+                categoryInput.value = subcategoryId;
+
+                selectedCategoryButton.textContent = subcategoryName;
+
+
+                // =================================================
+                // УБИРАЕМ СТАРОЕ ВЫДЕЛЕНИЕ
+                // =================================================
+
+                subcategoryButtons.forEach(function (button) {
+
+                    button.classList.remove('selected-subcategory');
+
+                });
+
+
+                // =================================================
+                // ВЫДЕЛЯЕМ НОВУЮ ПОДКАТЕГОРИЮ
+                // =================================================
+
+                subcategoryButton.classList.add('selected-subcategory');
+
+
+                // =================================================
+                // СКРЫВАЕМ ПОДКАТЕГОРИИ
+                // =================================================
+
+                subcategoryLists.forEach(function (list) {
+
+                    list.style.display = 'none';
+
+                });
+
+
+                if (categoryMessage) {
+
+                    categoryMessage.textContent = '✅ Вы выбрали подкатегорию: ' + subcategoryName;
+
+                }
+
+
+                console.log('Выбрана подкатегория:', categoryInput.value);
+
+                return;
+
+            }
+
+        });
+
+
+        // =========================================================
+        // СОХРАНЕНИЕ ФОРМЫ
+        // =========================================================
+
+        container.addEventListener('submit', function (event) {
 
             event.preventDefault();
 
-            const clickedStatus = this;
-            const eachStatus = this.getAttribute('href');
+            const form = event.target;
 
+            const url = form.getAttribute('action');
 
-            fetch(eachStatus)
+            if (!url) {
+                console.error('У формы нет action');
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
                 .then(function (response) {
-                    return response.json();
+
+                    return response.json().then(function (data) {
+
+                        if (!response.ok) {
+                            throw data;
+                        }
+
+                        return data;
+
+                    });
+
                 })
                 .then(function (data) {
 
-                    adsContainer.innerHTML = data.html;
+                    if (data.status === 'success') {
 
-                    overallStatuses.forEach(function (status) {
-                        status.classList.remove(
-                            'fw-bold',
-                            'text-dark',
-                            'border-bottom',
-                            'border-3',
-                            'border-dark'
-                        );
-                    });
+                        container.innerHTML = data.content;
 
-                    clickedStatus.classList.add(
-                        'fw-bold',
-                        'text-dark',
-                        'border-bottom',
-                        'border-3',
-                        'border-dark'
-                    );
+                        initStatus();
+                        initEdit();
+                        initDelete();
+                        initToarchive();
+                        initRtoActive();
+
+                    }
+
                 })
                 .catch(function (error) {
-                    console.error('Ошибка AJAX:', error);
+
+                    console.error('Ошибка сохранения:', error);
+
+                    if (error && error.status === 'error' && error.edit) {
+
+                        container.innerHTML = error.edit;
+
+                    }
+
                 });
+
         });
+
+
+        // =========================================================
+        // ПЕРВЫЙ ЗАПУСК
+        // =========================================================
+
+        initStatus();
+        initEdit();
+        initDelete();
+        initToarchive();
+        initRtoActive();
+
     });
-});
+
 </script>
+
 
 {% endblock %}

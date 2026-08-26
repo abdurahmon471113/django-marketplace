@@ -1,0 +1,65 @@
+<div class="ads-content-wrapper">
+
+    <!-- =====================================================
+         СТАТУСЫ
+         ===================================================== -->
+
+    <div class="mb-4">
+
+        <a
+            href="{% url 'main:my_ads_list_ajax' %}?status=active"
+            class="status-link p-3 text-decoration-none
+            {% if current_status == 'active' %}
+                fw-bold text-dark border-bottom border-3 border-dark
+            {% endif %}"
+        >
+            Активные
+        </a>
+
+
+        <a
+            href="{% url 'main:my_ads_list_ajax' %}?status=waiting"
+            class="status-link p-3 text-decoration-none
+            {% if current_status == 'waiting' %}
+                fw-bold text-dark border-bottom border-3 border-dark
+            {% endif %}"
+        >
+            Ожидающие
+        </a>
+
+
+        <a
+            href="{% url 'main:my_ads_list_ajax' %}?status=archived"
+            class="status-link p-3 text-decoration-none
+            {% if current_status == 'archived' %}
+                fw-bold text-dark border-bottom border-3 border-dark
+            {% endif %}"
+        >
+            Архив
+        </a>
+
+
+        <a
+            href="{% url 'main:my_ads_list_ajax' %}?status=rejected"
+            class="status-link p-3 text-decoration-none
+            {% if current_status == 'rejected' %}
+                fw-bold text-dark border-bottom border-3 border-dark
+            {% endif %}"
+        >
+            Отклонённые
+        </a>
+
+    </div>
+
+
+    <!-- =====================================================
+         КАРТОЧКИ
+         ===================================================== -->
+
+    <div class="ads-container">
+
+        {% include 'main/partials/my-ads-cards.html' %}
+
+    </div>
+
+</div>

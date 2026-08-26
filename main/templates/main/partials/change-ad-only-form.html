@@ -1,0 +1,357 @@
+
+<h1 class="fw-bold ms-3">Редактировать объявление</h1>
+
+<div class="container mt-4">
+
+    <form
+        method="POST"
+        action="{% url 'main:change_ad_ajax' ad.pk %}"
+        enctype="multipart/form-data"
+    >
+
+        {% csrf_token %}
+
+        <!-- ID выбранной категории / подкатегории -->
+        <input
+            type="hidden"
+            name="category"
+            id="category-input"
+            value="{{ form.instance.category.id }}"
+        >
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <strong>Ошибка:</strong>
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+
+        <!-- ========================= -->
+        <!-- НАЗВАНИЕ -->
+        <!-- ========================= -->
+
+        <div class="p-4 mb-3 card shadow border-0">
+
+            <h5 class="fw-bold mb-3">
+                Опишите в подробностях
+            </h5>
+
+            <div class="form-group mb-3">
+
+                {{ form.title.label_tag }}
+
+                {{ form.title }}
+
+                {% for error in form.title.errors %}
+                    <p class="error">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- КАТЕГОРИЯ -->
+            <!-- ========================= -->
+
+            <div class="form-group">
+
+                <p class="mb-1">
+                    Выберите категорию:
+                </p>
+
+                <div class="dropdown">
+
+                    <!-- Текущая категория -->
+                    <button
+                        id="category-button"
+                        class="create_ad_category_button btn btn-secondary dropdown-toggle fw-bold text-dark"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        {{ form.instance.category.name }}
+                    </button>
+
+
+                    <!-- Родительские категории -->
+                    <ul class="dropdown-menu">
+
+                        {% for category in catg %}
+
+                            <li>
+
+                                <button
+                                    type="button"
+                                    class="category dropdown-item fw-bold"
+                                    data-category-id="{{ category.id }}"
+                                    data-category-name="{{ category.name }}"
+                                    data-has-children="{{ category.children.exists }}"
+                                >
+                                    {{ category.name }}
+                                </button>
+
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- ПОДКАТЕГОРИИ -->
+                <!-- ========================= -->
+
+                {% for category in catg %}
+
+                    {% if category.children.exists %}
+
+                        <div
+                            id="subcategory-{{ category.id }}"
+                            class="subcategory-list mt-2"
+
+                            {% if form.instance.category.parent.id == category.id %}
+                                style="display: block;"
+                            {% else %}
+                                style="display: none;"
+                            {% endif %}
+                        >
+
+                            {% for subcategory in category.children.all %}
+
+                                <button
+                                    type="button"
+                                    class="
+                                        subcategory
+                                        btn
+                                        btn-outline-secondary
+                                        me-1
+                                        mb-1
+                                        fw-bold
+                                        text-dark
+
+                                        {% if form.instance.category.id == subcategory.id %}
+                                            selected-subcategory
+                                        {% endif %}
+                                    "
+
+                                    data-category-id="{{ subcategory.id }}"
+                                    data-category-name="{{ subcategory.name }}"
+                                >
+                                    {{ subcategory.name }}
+                                </button>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                {% for error in form.category.errors %}
+
+                    <p class="error">
+                        {{ error }}
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="category-message"></div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- ФОТО -->
+        <!-- ========================= -->
+
+        <div class="p-4 mb-3 card shadow border-0">
+
+            <h5 class="fs-3 fw-bold mb-3">
+                Фото
+            </h5>
+
+            <div class="row g-3">
+
+                <div class="col-md-3">
+
+                    {% if form.instance.images %}
+
+                        <p class="mb-3 fw-bold">
+
+                            Текущее фото:
+
+                            <img
+                                src="{{ form.instance.images.url }}"
+                                alt="Текущее фото"
+                                style="
+                                    width: 160px;
+                                    height: 120px;
+                                    object-fit: cover;
+                                "
+                                id="current-image"
+                            >
+
+                        </p>
+
+                        <div class="image-message"></div>
+
+                    {% endif %}
+
+
+                    <label
+                        for="{{ form.images.id_for_label }}"
+                        class="image-file d-flex justify-content-center align-items-center fw-bold fs-5"
+                        style="
+                            cursor: pointer;
+                            background-color: #FFFBEF;
+                            min-height: 145px;
+                        "
+                    >
+                        Сменить фото
+                    </label>
+
+
+                    <div style="display: none;">
+                        {{ form.images }}
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- ЦЕНА -->
+        <!-- ========================= -->
+
+        <div class="p-4 mb-3 card shadow border-0">
+
+            {{ form.price.label_tag }}
+
+            {{ form.price }}
+
+            {% for error in form.price.errors %}
+
+                <p class="error">
+                    {{ error }}
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- ОПИСАНИЕ -->
+        <!-- ========================= -->
+
+        <div class="p-4 mb-3 card shadow border-0">
+
+            {{ form.description.label_tag }}
+
+            {{ form.description }}
+
+            {% for error in form.description.errors %}
+
+                <p class="error">
+                    {{ error }}
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- КОНТАКТЫ -->
+        <!-- ========================= -->
+
+        <div class="p-4 mb-3 card shadow border-0">
+
+            <h5 class="fw-bold mb-3">
+                Контактная информация
+            </h5>
+
+
+            {{ form.contact_person.label_tag }}
+
+            {{ form.contact_person }}
+
+            {% for error in form.contact_person.errors %}
+
+                <p class="error">
+                    {{ error }}
+                </p>
+
+            {% endfor %}
+
+
+            {{ form.email.label_tag }}
+
+            {{ form.email }}
+
+            {% for error in form.email.errors %}
+
+                <p class="error">
+                    {{ error }}
+                </p>
+
+            {% endfor %}
+
+
+            {{ form.phone.label_tag }}
+
+            {{ form.phone }}
+
+            {% for error in form.phone.errors %}
+
+                <p class="error">
+                    {{ error }}
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- ========================= -->
+        <!-- СОХРАНИТЬ -->
+        <!-- ========================= -->
+
+        <div class="p-4 mb-3 card shadow border-0">
+
+            <div class="ms-auto">
+
+                <button
+                    type="submit"
+                    class="btn btn-dark rounded-1 btn-lg save-edit-button"
+                >
+                    Сохранить изменения
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+<style>
+    .selected-subcategory {
+        background-color: #212529 !important;
+        color: white !important;
+        border-color: #212529 !important;
+    }
+</style>
+

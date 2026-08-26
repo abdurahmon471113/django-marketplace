@@ -28,6 +28,47 @@ def my_ads_list_view(request):
     )
 
 
+
+@login_required
+def my_ads_list_ajax_view(request):
+
+    if request.method != "GET":
+        return JsonResponse({
+            "status": "error",
+            "message": "Only GET requests are allowed"
+        }, status=405)
+
+
+    current_status = request.GET.get(
+        "status",
+        StatusChoices.ACTIVE
+    )
+
+
+    my_ads = Advertisement.objects.filter(
+        author=request.user,
+        status=current_status
+    ).order_by("-created_at")
+
+
+
+    content_html = render_to_string(
+        "main/partials/my-ads-content.html",
+        {
+            "my_ads": my_ads,
+            "current_status": current_status,
+        },
+        request=request
+    )
+
+
+    return JsonResponse({
+        "status": "success",
+        "content": content_html,
+    })
+
+
+
 @login_required
 def archive_ad_view(request, pk):
     ad = get_object_or_404(Advertisement, author=request.user, pk=pk)
@@ -38,6 +79,68 @@ def archive_ad_view(request, pk):
         ad.status = StatusChoices.ACTIVE
         ad.save()
     return redirect("main:my_ads")
+
+
+
+@login_required
+def archive_ad_ajax_view(request, pk):
+
+    if request.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "message": "Only POST requests are allowed",
+        }, status=405)
+
+    ad = get_object_or_404(
+        Advertisement,
+        author=request.user,
+        pk=pk
+    )
+
+    if ad.status == StatusChoices.ACTIVE:
+        ad.status = StatusChoices.ARCHIVED
+        ad.save()
+
+    return JsonResponse({
+        "status": "success",
+        "message": "Объявление добавлено в архив",
+        "ad_id": pk,
+    })
+
+
+
+@login_required
+def from_archive_ajax_view(request, pk):
+    if request.method != "POST":
+        return JsonResponse({
+            "status": "error",
+            "message": "Only POST requests are allowed",
+        }, status=405)
+
+    ad = get_object_or_404(
+        Advertisement,
+        author=request.user,
+        pk=pk
+    )
+
+    if ad.status == StatusChoices.ARCHIVED:
+        ad.status = StatusChoices.ACTIVE
+        ad.save()
+
+    return JsonResponse({
+        "status": "success",
+        "message": "Объявление выведено из архива",
+        "ad_id": pk,
+    })
+    
+
+
+
+
+
+
+
+
 
 
 @login_required
@@ -95,10 +198,160 @@ def change_ad_view(request, pk):
 
 
 @login_required
+def change_ad_ajax_view(request, pk):
+
+    catg = Category.objects.filter(parent=None)
+
+    ad = get_object_or_404(
+        Advertisement,
+        pk=pk,
+        author=request.user
+    )
+
+
+    # =========================================================
+    # GET — показать форму
+    # =========================================================
+
+    if request.method == "GET":
+
+        form = AdvertisementForm(
+            instance=ad,
+            user=request.user
+        )
+
+
+        edit_form = render_to_string(
+            "main/partials/change-ad-only-form.html",
+            {
+                "form": form,
+                "catg": catg,
+                "ad": ad,
+            },
+            request=request
+        )
+
+
+        return JsonResponse({
+            "status": "success",
+            "edit": edit_form,
+        })
+
+
+    # =========================================================
+    # POST — сохранить
+    # =========================================================
+
+    if request.method == "POST":
+
+        form = AdvertisementForm(
+            request.POST,
+            request.FILES,
+            instance=ad,
+            user=request.user
+        )
+
+
+        if form.is_valid():
+
+            ad = form.save()
+
+
+            # ВАЖНО:
+            # берём статус уже ПОСЛЕ сохранения
+
+            current_status = ad.status
+
+
+            # Берём ТОЛЬКО объявления
+            # с этим статусом
+
+            my_ads = Advertisement.objects.filter(
+                author=request.user,
+                status=current_status
+            ).order_by("-created_at")
+
+
+            # Возвращаем статусы + карточки
+
+            content_html = render_to_string(
+                "main/partials/my-ads-content.html",
+                {
+                    "my_ads": my_ads,
+                    "current_status": current_status,
+                },
+                request=request
+            )
+
+
+            return JsonResponse({
+                "status": "success",
+                "content": content_html,
+            })
+
+
+        # =====================================================
+        # Ошибка формы
+        # =====================================================
+
+        edit_form = render_to_string(
+            "main/partials/change-ad-only-form.html",
+            {
+                "form": form,
+                "catg": catg,
+                "ad": ad,
+            },
+            request=request
+        )
+
+
+        return JsonResponse({
+            "status": "error",
+            "edit": edit_form,
+        }, status=400)
+
+
+
+    return JsonResponse({
+        "status": "error",
+        "message": "Only GET and POST requests are allowed",
+    }, status=405)
+
+
+
+
+@login_required
 def delete_ad_view(request, pk):
     my_ads = Advertisement.objects.filter(author=request.user, pk=pk)
     my_ads.delete()
     return redirect(reverse("main:my_ads") + "?status=waiting")
+
+
+
+@login_required
+def delete_ad_ajax_view(request, pk):
+    if request.method == "POST":
+
+        ad = get_object_or_404(
+            Advertisement,
+            pk=pk,
+            author=request.user
+        )
+
+
+        ad.delete()
+
+
+        return JsonResponse({
+            "status": "success",
+            "message": "Объявление удалено",
+            "ad_id": pk,
+        })
+
+    return JsonResponse({
+        "status": "error",
+        "message": "Only POST requests are allowed",
+    }, status=405)
 
 
 def home_view(request):
@@ -203,28 +456,3 @@ def delete_favorite_ad_ajax(request, pk):
         {"status": "error", "message": "Only POST requests allowed"}, status=405
     )
 
-
-@login_required
-def my_ads_list_ajax_view(request):
-
-    if request.method != "GET":
-        return JsonResponse(
-            {"status": "error", "message": "Only GET requests allowed"}, status=405
-        )
-
-    current_status = request.GET.get("status", StatusChoices.ACTIVE)
-
-    my_ads = Advertisement.objects.filter(
-        author=request.user, status=current_status
-    ).order_by("-created_at")
-
-    html = render_to_string(
-        "main/partials/my_ads_cards.html",
-        {
-            "my_ads": my_ads,
-            "current_status": current_status,
-        },
-        request=request,
-    )
-
-    return JsonResponse({"html": html})
