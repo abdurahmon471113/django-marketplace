@@ -75,3 +75,57 @@ class ArchiveActiveAdAjaxViewTest(TestCase):
 
 
 
+
+
+
+class DeleteAdTest(TestCase):
+
+    def test_delete_ad_ajax_from_my_ads(self):
+          # INPUT: создаём пользователя
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+
+        # INPUT: создаём категорию,
+        # потому что Advertisement требует category
+        category = Category.objects.create(
+            name="Test category",
+        )
+
+        # INPUT: создаём ACTIVE-объявление,
+        # автором которого является user
+        ad = Advertisement.objects.create(
+            category=category,
+            title="Test advertisement",
+            price=100,
+            author=user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        # INPUT: пользователь авторизован
+        self.client.force_login(user)
+
+        # POST: Тут мы проверяем правильный ли request.method == POST и отправляем на функцию
+        response = self.client.post(
+            reverse("main:delete_ad_ajax", kwargs={"pk": ad.pk})
+        )
+
+        # Тут после удаления мы тестим осталось ли то самое ad в БД и это главная проверка в этом тесте
+        self.assertFalse(Advertisement.objects.filter(pk=ad.pk).exists())
+
+        # Тут проверяет правильно ли без error функция выдаёт success
+        self.assertEqual(response.json()["status"], "success")
+        self.assertEqual(response.json()["ad_id"], ad.pk)
+        
+
+
+
+
+
+
+
+
+
+
