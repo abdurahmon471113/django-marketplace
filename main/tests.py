@@ -6,7 +6,7 @@ from main.choices import StatusChoices
 from main.models import Advertisement, Category
 
 
-class ArchiveAdAjaxViewTest(TestCase):
+class ArchiveActiveAdAjaxViewTest(TestCase):
 
     def setUp(self):
         # INPUT: создаём пользователя
@@ -36,7 +36,7 @@ class ArchiveAdAjaxViewTest(TestCase):
         self.client.force_login(self.user)
 
 
-    def test_archive_active_ad_by_author(self):
+    def test_active_to_archive_ajax(self):
     
         # INPUT: отправляем POST-запрос
         response = self.client.post(
@@ -57,7 +57,7 @@ class ArchiveAdAjaxViewTest(TestCase):
 
 
 
-    def test_from_archive_active_ad_by_author(self):
+    def test_from_archive_to_active_ajax(self):
        
 
         response = self.client.post(
