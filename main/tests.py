@@ -1,9 +1,10 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
+import json
 
 from main.choices import StatusChoices
-from main.models import Advertisement, Category
+from main.models import Advertisement, Category, SavedAd
 
 
 class ArchiveActiveAdAjaxViewTest(TestCase):
@@ -216,6 +217,64 @@ class MyAdsPageTest(TestCase):
         self.assertEqual(response.json()["status"], "success")
         # Выводим форму по запросу GET : content
         self.assertIn("content", response.json())
+        
+        
+        
+        
+        
+        
+        
+class SaveToFavorite(TestCase):
+    
+    def test_save_favorite_ad_ajax(self):
+        # INPUT: создаём пользователя
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+
+        # INPUT: создаём категорию,
+        # потому что Advertisement требует category
+        category = Category.objects.create(
+            name="Test category",
+        )
+
+        # INPUT: создаём ACTIVE-объявление,
+        # автором которого является user
+        ad = Advertisement.objects.create(
+            category=category,
+            title="Test advertisement",
+            price=100,
+            author=user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        # INPUT: пользователь авторизован
+        self.client.force_login(user)
+        
+        self.assertFalse(SavedAd.objects.filter(user=user, advertisement=ad).exists())
+        # self.assertTrue(SavedAd.objects.filter(user=user, advertisement=ad).exists())
+
+        
+        
+        response = self.client.post(
+            reverse("main:save_favorite_ad_ajax", kwargs={"pk": ad.pk}),
+            data=json.dumps({
+                "message": "Успешно добавлено",
+            }),
+            content_type="application/json",
+        )
+        
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+        
+        self.assertTrue(SavedAd.objects.filter(user=user, advertisement=ad).exists())
+        
+
+
+        
         
 
         
