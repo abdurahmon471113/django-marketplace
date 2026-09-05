@@ -142,7 +142,7 @@ def from_archive_ajax_view(request, pk):
 
 
 
-
+# Tested function
 @login_required
 def ad_detail_view(request, pk):
     ad = Advertisement.objects.get(pk=pk)
