@@ -274,6 +274,46 @@ class SaveToFavorite(TestCase):
         
 
 
+
+
+
+class AdDetailTest(TestCase):
+    
+    def test_ad_detail_view(self):
+        # INPUT: создаём пользователя
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+
+        # INPUT: создаём категорию,
+        # потому что Advertisement требует category
+        category = Category.objects.create(
+            name="Test category",
+        )
+
+        # INPUT: создаём ACTIVE-объявление,
+        # автором которого является user
+        ad = Advertisement.objects.create(
+            category=category,
+            title="Test advertisement",
+            price=100,
+            author=user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        # INPUT: пользователь авторизован
+        self.client.force_login(user)
+        
+        response = self.client.get(
+            reverse("main:ad_detail", kwargs={"pk": ad.pk})
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/ad-detail.html")
+        
+
         
         
 

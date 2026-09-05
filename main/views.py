@@ -410,6 +410,8 @@ def delete_favorite_ad(request, pk):
         return redirect(f"main:{redirect_to}", pk=pk)
 
 
+
+# Tested function
 @login_required
 def save_favorite_ad_ajax(request, pk):
     if request.method == "POST":
