@@ -28,7 +28,7 @@ def my_ads_list_view(request):
     )
 
 
-
+# Tested function
 @login_required
 def my_ads_list_ajax_view(request):
 
@@ -81,7 +81,7 @@ def archive_ad_view(request, pk):
     return redirect("main:my_ads")
 
 
-
+# Tested function
 @login_required
 def archive_ad_ajax_view(request, pk):
 
@@ -108,7 +108,7 @@ def archive_ad_ajax_view(request, pk):
     })
 
 
-
+# Tested function
 @login_required
 def from_archive_ajax_view(request, pk):
     if request.method != "POST":
@@ -142,7 +142,7 @@ def from_archive_ajax_view(request, pk):
 
 
 
-
+# Tested function
 @login_required
 def ad_detail_view(request, pk):
     ad = Advertisement.objects.get(pk=pk)
@@ -197,6 +197,8 @@ def change_ad_view(request, pk):
     return render(request, "main/change-ad.html", {"form": form, "catg": catg})
 
 
+
+# Tested function
 @login_required
 def change_ad_ajax_view(request, pk):
 
@@ -327,7 +329,7 @@ def delete_ad_view(request, pk):
     return redirect(reverse("main:my_ads") + "?status=waiting")
 
 
-
+# Tested function
 @login_required
 def delete_ad_ajax_view(request, pk):
     if request.method == "POST":
@@ -408,6 +410,8 @@ def delete_favorite_ad(request, pk):
         return redirect(f"main:{redirect_to}", pk=pk)
 
 
+
+# Tested function
 @login_required
 def save_favorite_ad_ajax(request, pk):
     if request.method == "POST":
