@@ -153,12 +153,11 @@ def ad_detail_view(request, pk):
         {"ad": ad, "is_already_in_saved": is_already_in_saved},
     )
 
-
+# Tested function
 @login_required
 def create_ad_view(request):
     catg = Category.objects.filter(parent=None)
     if request.method == "POST":
-        print("POST:", request.POST)
         form = AdvertisementForm(
             request.POST,
             request.FILES,
@@ -178,7 +177,7 @@ def create_ad_view(request):
 
     return render(request, "main/create-ad.html", {"form": form, "catg": catg})
 
-
+# Tested function
 @login_required
 def change_ad_view(request, pk):
     catg = Category.objects.filter(parent=None)

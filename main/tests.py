@@ -301,7 +301,7 @@ class SaveDeleteToFavoriteAjax(TestCase):
 
 class AdDetailTest(TestCase):
     
-    def test_ad_detail_view(self):
+    def test_ad_detail(self):
         # INPUT: создаём пользователя
         user = User.objects.create_user(
             username="user_a",
@@ -599,5 +599,187 @@ class MyAdsList(TestCase):
         self.assertIn(ad, response.context["my_ads"], response.context["current_status"])
         
         
+        
+        
+        
+class CreateChangeDeleteAd(TestCase):
+    def setUp(self):
+        # INPUT: создаём пользователя
+        self.user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+
+        # INPUT: создаём категорию,
+        # потому что Advertisement требует category
+        self.category = Category.objects.create(
+            name="Test category",
+        )
+
+        # INPUT: создаём ACTIVE-объявление,
+        # автором которого является user
+        self.ad = Advertisement.objects.create(
+            category=self.category,
+            title="Test advertisement",
+            price=100,
+            author=self.user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        # INPUT: пользователь авторизован
+        self.client.force_login(self.user)
+        
+        
+    def test_create_ad_POST(self):
+        # POST
+        response = self.client.post(
+            reverse("main:create_ad"),
+            data={
+                "category": self.category.pk,
+                "title": "New advertisement",
+                "price": 200,
+                "description": "Updated description for testing the advertisement form",
+                "contact_person": "Updated User",
+                "phone": "+998901234567",
+            }
+        )
+        
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:my_ads"))
+    
+        
+        self.assertTrue(Advertisement.objects.filter(title="New advertisement",author=self.user,).exists())
+
+        
+        
+        
+        
+        
+    def test_create_ad_GET(self):
+        # GET
+        response = self.client.get(
+            reverse("main:create_ad")
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/create-ad.html")
+        self.assertIn("form", response.context)
+        self.assertIn("catg", response.context)
+        
+        
+        
+        
+    def test_change_ad_POST(self):
+        
+        # POST
+
+        
+        response = self.client.post(
+            reverse("main:change_ad", kwargs={"pk": self.ad.pk}),
+            data={
+                "category": self.category.pk,
+                "title": "Updated advertisement",
+                "price": 200,
+                "description": "Updated description for testing the advertisement form",
+                "contact_person": "Updated User",
+                "phone": "+998901234567",
+            }
+        )
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:my_ads"))
+        
+        self.ad.refresh_from_db()
+
+        self.assertEqual(self.ad.title, "Updated advertisement")
+        self.assertEqual(self.ad.price, 200)
+        self.assertEqual(self.ad.description, "Updated description for testing the advertisement form")
+        self.assertEqual(self.ad.contact_person, "Updated User")
+        self.assertEqual(self.ad.phone, "+998901234567")
+        
+        self.assertTrue(Advertisement.objects.filter(author=self.user, pk=self.ad.pk).exists())
+        
+        
+        
+        
+        
+    def test_change_ad_GET(self):
+        
+        # GET
+
+        
+        response = self.client.get(
+            reverse("main:change_ad", kwargs={"pk": self.ad.pk})
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/change-ad.html")
+        self.assertIn("form", response.context)
+        self.assertIn("catg", response.context)
+        
+                
+        
+        
+    
+    def test_delete_ad(self):
+        response = self.client.post(
+            reverse("main:delete_ad", kwargs={"pk": self.ad.pk})
+        )
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:my_ads") + "?status=waiting")
+        self.assertFalse(Advertisement.objects.filter(author=self.user, pk=self.ad.pk).exists())
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
+        
+
+         
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
+        
+
+         
+        
+    
+        
+        
+        
+        
+        
+        
+
+        
+        
+
+         
         
     
