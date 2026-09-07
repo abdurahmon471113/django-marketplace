@@ -376,6 +376,8 @@ def home_view(request):
     return render(request, "main/home.html", {"ads": ads})
 
 
+
+# Tested function do 3
 @login_required
 def saved_ads_view(request):
     ad_ids = SavedAd.objects.filter(user=request.user).values_list(
@@ -385,6 +387,8 @@ def saved_ads_view(request):
     return render(request, "main/favorites.html", {"ads": ads})
 
 
+
+# Tested function do 1
 @login_required
 def save_favorite_ad(request, pk):
     if request.method == "POST":
@@ -395,8 +399,10 @@ def save_favorite_ad(request, pk):
         if redirect_to == "home" or redirect_to == "favorites":
             return redirect(f"main:{redirect_to}")
         return redirect(f"main:{redirect_to}", pk=pk)
+    
+    
 
-
+# Tested function do 2
 @login_required
 def delete_favorite_ad(request, pk):
     if request.method == "POST":

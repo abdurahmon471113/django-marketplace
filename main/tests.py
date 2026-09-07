@@ -224,7 +224,7 @@ class MyAdsPageTest(TestCase):
         
         
         
-class SaveDeleteToFavorite(TestCase):
+class SaveDeleteToFavoriteAjax(TestCase):
     
     def setUp(self):
 
@@ -334,6 +334,116 @@ class AdDetailTest(TestCase):
         
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "main/ad-detail.html")
+        
+        
+        
+        
+
+class SaveDeleteToFavorite(TestCase):
+    
+    def setUp(self):
+        
+        # INPUT: создаём пользователя
+        self.user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+
+        # INPUT: создаём категорию,
+        # потому что Advertisement требует category
+        self.category = Category.objects.create(
+            name="Test category",
+        )
+
+        # INPUT: создаём ACTIVE-объявление,
+        # автором которого является user
+        self.ad = Advertisement.objects.create(
+            category=self.category,
+            title="Test advertisement",
+            price=100,
+            author=self.user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        # INPUT: пользователь авторизован
+        self.client.force_login(self.user)
+        
+        
+    def test_save_favorite_ad_path_to_main_home(self):
+        
+        # Test into function save_favorite_ad which path goes to home. Main purpose of test if its redirects correctly
+        
+        response = self.client.post(
+            reverse("main:save_favorite_ad", kwargs={"pk": self.ad.pk}),
+            {
+            "redirect_to": "home"
+            }
+        )
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:home"))
+        self.assertTrue(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
+        
+        
+        
+        
+    def test_save_favorite_ad_path_to_main_saved_ads(self):
+        
+        # Test into function save_favorite_ad which path goes to saved_ads. Main purpose of test if its redirects correctly
+        
+        response = self.client.post(
+            reverse("main:save_favorite_ad", kwargs={"pk": self.ad.pk}),
+            {
+            "redirect_to": "saved_ads"
+            }
+        )
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:saved_ads"))
+        self.assertTrue(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
+        
+        
+        
+        
+    def test_delete_favorite_ad_path_to_main_home(self):
+        
+        # Test into function delete_favorite_ad which path goes to home. Main purpose of test if its redirects correctly
+        
+        response = self.client.post(
+            reverse("main:delete_favorite_ad", kwargs={"pk": self.ad.pk}),
+            {
+            "redirect_to": "home"
+            }
+        )
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:home"))
+        self.assertFalse(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
+        
+        
+        
+    def test_delete_favorite_ad_path_to_main_saved_ads(self):
+        
+        # Test into function delete_favorite_ad which path goes to saved_ads. Main purpose of test if its redirects correctly
+        
+        response = self.client.post(
+            reverse("main:delete_favorite_ad", kwargs={"pk": self.ad.pk}),
+            {
+            "redirect_to": "saved_ads"
+            }
+        )
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:saved_ads"))
+        self.assertFalse(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
+        
+        
+    
+        
+        
+        
+
         
 
         
