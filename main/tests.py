@@ -736,9 +736,49 @@ class CreateChangeDeleteAd(TestCase):
         
         
         
+class ActiveToArchive(TestCase):
+    
+    def test_active_archive_change_button(self):
+        # INPUT: создаём пользователя
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+
+        # INPUT: создаём категорию,
+        # потому что Advertisement требует category
+        category = Category.objects.create(
+            name="Test category",
+        )
+
+        # INPUT: создаём ACTIVE-объявление,
+        # автором которого является user
+        ad = Advertisement.objects.create(
+            category=category,
+            title="Test advertisement",
+            price=100,
+            author=user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        # INPUT: пользователь авторизован
+        self.client.force_login(user)
         
         
+        response = self.client.post(
+            reverse("main:archive_ad", kwargs={"pk": ad.pk})
+        )
         
+
+        
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("main:my_ads"))
+        
+        ad.refresh_from_db()
+
+
+        self.assertEqual(ad.status, StatusChoices.ARCHIVED)
         
 
         
