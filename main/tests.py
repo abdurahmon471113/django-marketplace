@@ -473,3 +473,92 @@ class SavedAdsInFavoritesPage(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "main/favorites.html")
         self.assertIn(ad, response.context["ads"])
+
+
+
+
+
+
+class HomePage(TestCase):
+    
+    def test_home_page(self):
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+
+        category = Category.objects.create(
+            name="Test category",
+        )
+
+        ad = Advertisement.objects.create(
+            category=category,
+            title="Test advertisement",
+            price=100,
+            author=user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+        
+        
+        response = self.client.get(
+            reverse("main:home")
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/home.html")
+        self.assertIn(ad, response.context["ads"])
+        
+        
+        
+    def test_authentificated_user_doesnot_see_own_ad(self):
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+        
+        other_user = User.objects.create_user(
+            username="user_b",
+            password="password123456",
+        )
+        
+        category = Category.objects.create(
+            name="Test category",
+        )
+
+        own_ad = Advertisement.objects.create(
+            category=category,
+            title="My advertisement",
+            price=100,
+            author=user,
+            description="My description",
+            status=StatusChoices.ACTIVE,
+        )
+        
+        other_ad = Advertisement.objects.create(
+            category=category,
+            title="Other advertisement",
+            price=100,
+            author=other_user,
+            description="Other description",
+            status=StatusChoices.ACTIVE,
+        )
+        
+        self.client.force_login(user)
+        
+        response = self.client.get(
+            reverse("main:home")
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(own_ad, response.context["ads"])
+        self.assertIn(other_ad, response.context["ads"])
+        
+        
+        
+        
+        
+        
+        
+
+         

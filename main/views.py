@@ -358,7 +358,7 @@ def delete_ad_ajax_view(request, pk):
     
     
 
-# Tested function do 4
+# Tested function
 def home_view(request):
     ads = Advertisement.objects.filter(status=StatusChoices.ACTIVE)
     query = request.GET.get("q")
