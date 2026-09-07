@@ -436,6 +436,9 @@ def save_favorite_ad_ajax(request, pk):
     )
 
 
+
+
+# Tested function
 @login_required
 def delete_favorite_ad_ajax(request, pk):
     if request.method == "POST":

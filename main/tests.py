@@ -224,42 +224,46 @@ class MyAdsPageTest(TestCase):
         
         
         
-class SaveToFavorite(TestCase):
+class SaveDeleteToFavorite(TestCase):
     
-    def test_save_favorite_ad_ajax(self):
+    def setUp(self):
+
         # INPUT: создаём пользователя
-        user = User.objects.create_user(
+        self.user = User.objects.create_user(
             username="user_a",
             password="password123",
         )
 
         # INPUT: создаём категорию,
         # потому что Advertisement требует category
-        category = Category.objects.create(
+        self.category = Category.objects.create(
             name="Test category",
         )
 
         # INPUT: создаём ACTIVE-объявление,
         # автором которого является user
-        ad = Advertisement.objects.create(
-            category=category,
+        self.ad = Advertisement.objects.create(
+            category=self.category,
             title="Test advertisement",
             price=100,
-            author=user,
+            author=self.user,
             description="Test description",
             status=StatusChoices.ACTIVE,
         )
 
         # INPUT: пользователь авторизован
-        self.client.force_login(user)
+        self.client.force_login(self.user)
+    
+    def test_save_favorite_ad_ajax(self):
         
-        self.assertFalse(SavedAd.objects.filter(user=user, advertisement=ad).exists())
+        
+        self.assertFalse(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
         # self.assertTrue(SavedAd.objects.filter(user=user, advertisement=ad).exists())
 
         
         
         response = self.client.post(
-            reverse("main:save_favorite_ad_ajax", kwargs={"pk": ad.pk}),
+            reverse("main:save_favorite_ad_ajax", kwargs={"pk": self.ad.pk}),
             data=json.dumps({
                 "message": "Успешно добавлено",
             }),
@@ -270,9 +274,27 @@ class SaveToFavorite(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "success")
         
-        self.assertTrue(SavedAd.objects.filter(user=user, advertisement=ad).exists())
+        self.assertTrue(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
         
+        
+    
+    def test_delete_favorite_ad_ajax(self):
+        
+        url = reverse("main:delete_favorite_ad_ajax", kwargs={"pk": self.ad.pk})
+        response = self.client.post(url,
+        data=json.dumps({
+                "message": "Успешно добавлено",
+            }),
+            content_type="application/json",
+        )
+        
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "success")
+        # Chech is ad in SavedAd after save deleted from SavedAd db table
+        self.assertFalse(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
 
+        
 
 
 
