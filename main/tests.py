@@ -560,5 +560,44 @@ class HomePage(TestCase):
         
         
         
+class MyAdsList(TestCase):
+    
+    def test_my_ads_list(self):
+        
+        # INPUT: создаём пользователя
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
 
-         
+        # INPUT: создаём категорию,
+        # потому что Advertisement требует category
+        category = Category.objects.create(
+            name="Test category",
+        )
+
+        # INPUT: создаём ACTIVE-объявление,
+        # автором которого является user
+        ad = Advertisement.objects.create(
+            category=category,
+            title="Test advertisement",
+            price=100,
+            author=user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        # INPUT: пользователь авторизован
+        self.client.force_login(user)
+        
+        response = self.client.get(
+            reverse("main:my_ads")
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/my-ads-list.html")
+        self.assertIn(ad, response.context["my_ads"], response.context["current_status"])
+        
+        
+        
+    

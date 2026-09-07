@@ -11,7 +11,7 @@ from .choices import StatusChoices
 from .forms import AdvertisementForm
 from .models import Advertisement, Category, SavedAd
 
-
+# Tested function
 @login_required
 def my_ads_list_view(request):
 
@@ -321,7 +321,7 @@ def change_ad_ajax_view(request, pk):
 
 
 
-
+# Tested function
 @login_required
 def delete_ad_view(request, pk):
     my_ads = Advertisement.objects.filter(author=request.user, pk=pk)
@@ -358,7 +358,7 @@ def delete_ad_ajax_view(request, pk):
     
     
 
-# Tested function
+# Tested function but not every part 50/50
 def home_view(request):
     ads = Advertisement.objects.filter(status=StatusChoices.ACTIVE)
     query = request.GET.get("q")
