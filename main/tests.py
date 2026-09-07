@@ -439,18 +439,37 @@ class SaveDeleteToFavorite(TestCase):
         self.assertFalse(SavedAd.objects.filter(user=self.user, advertisement=self.ad).exists())
         
         
-    
-        
-        
-        
 
-        
+class SavedAdsInFavoritesPage(TestCase):
+    def test_saved_ads(self):
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
 
-        
-        
+        category = Category.objects.create(
+            name="Test category",
+        )
 
-        
-        
-        
-        
-    
+        ad = Advertisement.objects.create(
+            category=category,
+            title="Test advertisement",
+            price=100,
+            author=user,
+            description="Test description",
+            status=StatusChoices.ACTIVE,
+        )
+
+        SavedAd.objects.create(
+            advertisement=ad,
+            user=user,
+        )
+
+        self.client.force_login(user)
+
+        url = reverse("main:saved_ads")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/favorites.html")
+        self.assertIn(ad, response.context["ads"])

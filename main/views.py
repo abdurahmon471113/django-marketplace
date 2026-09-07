@@ -354,8 +354,11 @@ def delete_ad_ajax_view(request, pk):
         "status": "error",
         "message": "Only POST requests are allowed",
     }, status=405)
+    
+    
+    
 
-
+# Tested function do 4
 def home_view(request):
     ads = Advertisement.objects.filter(status=StatusChoices.ACTIVE)
     query = request.GET.get("q")
@@ -377,7 +380,9 @@ def home_view(request):
 
 
 
-# Tested function do 3
+
+
+# Tested function
 @login_required
 def saved_ads_view(request):
     ad_ids = SavedAd.objects.filter(user=request.user).values_list(
@@ -388,7 +393,7 @@ def saved_ads_view(request):
 
 
 
-# Tested function do 1
+# Tested function
 @login_required
 def save_favorite_ad(request, pk):
     if request.method == "POST":
@@ -396,13 +401,13 @@ def save_favorite_ad(request, pk):
         user = request.user
         ad = get_object_or_404(Advertisement, pk=pk)
         SavedAd.objects.create(user=user, advertisement=ad)
-        if redirect_to == "home" or redirect_to == "favorites":
+        if redirect_to == "home" or redirect_to == "saved_ads":
             return redirect(f"main:{redirect_to}")
         return redirect(f"main:{redirect_to}", pk=pk)
     
     
 
-# Tested function do 2
+# Tested function 
 @login_required
 def delete_favorite_ad(request, pk):
     if request.method == "POST":
