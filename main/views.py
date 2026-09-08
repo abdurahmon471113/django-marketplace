@@ -11,7 +11,7 @@ from .choices import StatusChoices
 from .forms import AdvertisementForm
 from .models import Advertisement, Category, SavedAd
 
-
+# Tested function
 @login_required
 def my_ads_list_view(request):
 
@@ -28,7 +28,7 @@ def my_ads_list_view(request):
     )
 
 
-
+# Tested function
 @login_required
 def my_ads_list_ajax_view(request):
 
@@ -81,7 +81,7 @@ def archive_ad_view(request, pk):
     return redirect("main:my_ads")
 
 
-
+# Tested function
 @login_required
 def archive_ad_ajax_view(request, pk):
 
@@ -108,7 +108,7 @@ def archive_ad_ajax_view(request, pk):
     })
 
 
-
+# Tested function
 @login_required
 def from_archive_ajax_view(request, pk):
     if request.method != "POST":
@@ -142,7 +142,7 @@ def from_archive_ajax_view(request, pk):
 
 
 
-
+# Tested function
 @login_required
 def ad_detail_view(request, pk):
     ad = Advertisement.objects.get(pk=pk)
@@ -153,12 +153,11 @@ def ad_detail_view(request, pk):
         {"ad": ad, "is_already_in_saved": is_already_in_saved},
     )
 
-
+# Tested function
 @login_required
 def create_ad_view(request):
     catg = Category.objects.filter(parent=None)
     if request.method == "POST":
-        print("POST:", request.POST)
         form = AdvertisementForm(
             request.POST,
             request.FILES,
@@ -178,7 +177,7 @@ def create_ad_view(request):
 
     return render(request, "main/create-ad.html", {"form": form, "catg": catg})
 
-
+# Tested function
 @login_required
 def change_ad_view(request, pk):
     catg = Category.objects.filter(parent=None)
@@ -197,6 +196,8 @@ def change_ad_view(request, pk):
     return render(request, "main/change-ad.html", {"form": form, "catg": catg})
 
 
+
+# Tested function
 @login_required
 def change_ad_ajax_view(request, pk):
 
@@ -319,7 +320,7 @@ def change_ad_ajax_view(request, pk):
 
 
 
-
+# Tested function
 @login_required
 def delete_ad_view(request, pk):
     my_ads = Advertisement.objects.filter(author=request.user, pk=pk)
@@ -327,7 +328,7 @@ def delete_ad_view(request, pk):
     return redirect(reverse("main:my_ads") + "?status=waiting")
 
 
-
+# Tested function
 @login_required
 def delete_ad_ajax_view(request, pk):
     if request.method == "POST":
@@ -352,8 +353,11 @@ def delete_ad_ajax_view(request, pk):
         "status": "error",
         "message": "Only POST requests are allowed",
     }, status=405)
+    
+    
+    
 
-
+# Tested function but not every part 50/50
 def home_view(request):
     ads = Advertisement.objects.filter(status=StatusChoices.ACTIVE)
     query = request.GET.get("q")
@@ -374,6 +378,10 @@ def home_view(request):
     return render(request, "main/home.html", {"ads": ads})
 
 
+
+
+
+# Tested function
 @login_required
 def saved_ads_view(request):
     ad_ids = SavedAd.objects.filter(user=request.user).values_list(
@@ -383,6 +391,8 @@ def saved_ads_view(request):
     return render(request, "main/favorites.html", {"ads": ads})
 
 
+
+# Tested function
 @login_required
 def save_favorite_ad(request, pk):
     if request.method == "POST":
@@ -390,11 +400,13 @@ def save_favorite_ad(request, pk):
         user = request.user
         ad = get_object_or_404(Advertisement, pk=pk)
         SavedAd.objects.create(user=user, advertisement=ad)
-        if redirect_to == "home" or redirect_to == "favorites":
+        if redirect_to == "home" or redirect_to == "saved_ads":
             return redirect(f"main:{redirect_to}")
         return redirect(f"main:{redirect_to}", pk=pk)
+    
+    
 
-
+# Tested function 
 @login_required
 def delete_favorite_ad(request, pk):
     if request.method == "POST":
@@ -408,6 +420,8 @@ def delete_favorite_ad(request, pk):
         return redirect(f"main:{redirect_to}", pk=pk)
 
 
+
+# Tested function
 @login_required
 def save_favorite_ad_ajax(request, pk):
     if request.method == "POST":
@@ -432,6 +446,9 @@ def save_favorite_ad_ajax(request, pk):
     )
 
 
+
+
+# Tested function
 @login_required
 def delete_favorite_ad_ajax(request, pk):
     if request.method == "POST":
