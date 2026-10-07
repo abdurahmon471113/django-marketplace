@@ -212,11 +212,10 @@ class MyAdsPageTest(TestCase):
         
         # Проверяем работает ли функция без error + success
         self.assertEqual(response.status_code, 200)
-        print(response.json())
 
         self.assertEqual(response.json()["status"], "success")
         # Выводим форму по запросу GET : content
-        self.assertIn("content", response.json())
+        self.assertIn(ad.title, response.json()["content"])
         
         
         
@@ -553,6 +552,48 @@ class HomePage(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotIn(own_ad, response.context["ads"])
         self.assertIn(other_ad, response.context["ads"])
+        
+        
+        
+    def test_is_searched_by_title(self):
+        user = User.objects.create_user(
+            username="user_a",
+            password="password123",
+        )
+        
+        category = Category.objects.create(
+            name="Test category",
+        )
+        
+        found_ad = Advertisement.objects.create(
+            category=category,
+            title="Python",
+            price=100,
+            author=user,
+            description="My description",
+            status=StatusChoices.ACTIVE,
+        )
+        
+        
+        
+        
+        response = self.client.get(
+            reverse("main:home"),
+            {
+            "q": "thon"
+            }
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "main/home.html")
+        self.assertIn(found_ad, response.context["ads"])
+
+        
+        
+        
+        
+        
+        
         
         
         
